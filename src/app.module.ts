@@ -14,8 +14,8 @@ import { Transaction } from 'src/transactions/transaction.entity'
       isGlobal: true
     }),
     TypeOrmModule.forRoot({
+      name: 'cent',
       type: 'sqlite',
-      name: 'cent-sqlite',
       database: './db/cent.sqlite',
       logging: true,
       entities: [Contract, Transaction],
