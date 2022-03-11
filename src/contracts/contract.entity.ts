@@ -5,5 +5,5 @@ export class Contract {
   @PrimaryColumn({ unique: true })
   address: string
   @Column()
-  type: string
+  contract_type: string
 }

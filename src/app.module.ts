@@ -18,7 +18,6 @@ import { Transaction } from 'src/transactions/transaction.entity'
       inject: [ConfigService],
       useFactory: (config: ConfigService) => {
         const isDevelopment = config.get('NODE_ENV') === 'development'
-
         return {
           name: config.get<string>('DB_NAME'),
           database: config.get<string>('DB_PATH'),
