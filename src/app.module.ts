@@ -31,20 +31,19 @@ import { Transaction } from 'src/transactions/transaction.entity'
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => {
+        const isDevelopment = config.get('NODE_ENV') === 'development'
+        const username = config.get<string>('ANYBLOCK_DB_USER')
+        const password = config.get<string>('ANYBLOCK_DB_PASSWORD')
+        const host = config.get<string>('ANYBLOCK_DB_HOST')
+        const name = config.get<string>('ANYBLOCK_DB_NAME')
+        const port = config.get<string>('ANYBLOCK_DB_PORT')
+
         return {
           type: 'postgres',
-          host: config.get<string>('ANYBLOCK_DB_HOST'),
-          port: parseInt(config.get<string>('ANYBLOCK_DB_PORT'), 10),
-          username: config.get<string>('ANYBLOCK_DB_USER'),
-          password: config.get<string>('ANYBLOCK_DB_PASSWORD'),
-          name: config.get<string>('ANYBLOCK_DB_NAME'),
-          logging: true,
-          extra: {
-            ssl: true
-          },
+          url: `postgresql://${username}:${password}@${host}:${port}/${name}`,
+          logging: isDevelopment,
           ssl: {
-            rejectUnauthorized: false,
-            handshakeTimeout: 0
+            rejectUnauthorized: false
           }
         }
       }
