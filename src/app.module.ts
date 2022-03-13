@@ -1,12 +1,11 @@
 import { Module } from '@nestjs/common'
-import { AppController } from './app.controller'
-import { AppService } from './app.service'
+import { SequelizeModule } from '@nestjs/sequelize'
+import { AppController } from 'src/app.controller'
+import { AppService } from 'src/app.service'
 import { ConfigModule, ConfigService } from '@nestjs/config'
-import { TypeOrmModule } from '@nestjs/typeorm'
 import { ContractsModule } from 'src/contracts/contracts.module'
-import { TransactionsModule } from 'src/transactions/transactions.module'
 import { Contract } from 'src/contracts/contract.entity'
-import { Transaction } from 'src/transactions/transaction.entity'
+import { AnyblockModule } from './anyblock/anyblock.module'
 
 @Module({
   imports: [
@@ -14,25 +13,22 @@ import { Transaction } from 'src/transactions/transaction.entity'
       isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV}`
     }),
-    TypeOrmModule.forRootAsync({
+    SequelizeModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => {
-        const isDevelopment = config.get('NODE_ENV') === 'development'
         const dbPath = config.get<string>('DB_PATH')
         return {
-          type: 'sqlite',
-          database: dbPath,
-          logging: isDevelopment,
-          synchronize: isDevelopment,
-          entities: [Contract, Transaction]
+          dialect: 'sqlite',
+          storage: dbPath,
+          autoLoadModels: true,
+          synchronize: true,
+          models: [Contract]
         }
       }
     }),
-    TypeOrmModule.forRootAsync({
+    SequelizeModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => {
-        const isDevelopment = config.get('NODE_ENV') === 'development'
-        const dbConnectionName = config.get<string>('ANYBLOCK_DB_CONNECTION_NAME')
         const dbUserName = config.get<string>('ANYBLOCK_DB_USER')
         const dbPassword = config.get<string>('ANYBLOCK_DB_PASSWORD')
         const dbHost = config.get<string>('ANYBLOCK_DB_HOST')
@@ -41,19 +37,16 @@ import { Transaction } from 'src/transactions/transaction.entity'
         const dbURL = `postgresql://${dbUserName}:${dbPassword}@${dbHost}:${dbPort}/${dbName}`
 
         return {
-          name: dbConnectionName,
-          type: 'postgres',
+          name: 'anyblock_connection',
+          dialect: 'postgres',
           url: dbURL,
-          logging: isDevelopment,
           synchronize: false,
-          ssl: {
-            rejectUnauthorized: false
-          }
+          ssl: true
         }
       }
     }),
     ContractsModule,
-    TransactionsModule
+    AnyblockModule
   ],
   controllers: [AppController],
   providers: [AppService]

@@ -1,9 +1,9 @@
-import { Entity, Column, PrimaryColumn } from 'typeorm'
+import { Table, Model, Column } from 'sequelize-typescript'
 
-@Entity()
-export class Contract {
-  @PrimaryColumn({ unique: true })
+@Table
+export class Contract extends Model {
+  @Column
   address: string
-  @Column()
+  @Column
   contract_type: string
 }

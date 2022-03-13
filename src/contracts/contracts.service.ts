@@ -1,18 +1,18 @@
 import { Injectable } from '@nestjs/common'
-import { InjectRepository } from '@nestjs/typeorm'
+
 import { Contract } from 'src/contracts/contract.entity'
-import { Repository } from 'typeorm'
+import { InjectModel } from '@nestjs/sequelize'
 
 @Injectable()
 export class ContractsService {
-  constructor(@InjectRepository(Contract) private contractRepository: Repository<Contract>) {}
+  constructor(@InjectModel(Contract) private contractModel: typeof Contract) {}
 
   findAll() {
-    return this.contractRepository.find({})
+    return this.contractModel.findAll()
   }
 
-  create(address: string, contractType: string) {
-    const contract = this.contractRepository.create({ address, contract_type: contractType })
-    return this.contractRepository.save(contract)
+  async create(address: string, contractType: string) {
+    const contract = await this.contractModel.create({ address, contract_type: contractType })
+    return contract
   }
 }
