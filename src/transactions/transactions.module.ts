@@ -4,7 +4,7 @@ import { Transaction } from 'src/transactions/transaction.entity'
 import { TransactionsService } from 'src/transactions/transactions.service'
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Transaction], process.env.DB_NAME)],
+  imports: [TypeOrmModule.forFeature([Transaction])],
   providers: [TransactionsService]
 })
 export class TransactionsModule {}

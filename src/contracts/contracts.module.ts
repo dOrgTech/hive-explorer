@@ -4,7 +4,7 @@ import { Contract } from 'src/contracts/contract.entity'
 import { ContractsService } from 'src/contracts/contracts.service'
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Contract], process.env.DB_NAME)],
+  imports: [TypeOrmModule.forFeature([Contract])],
   providers: [ContractsService]
 })
 export class ContractsModule {}

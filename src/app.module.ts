@@ -18,10 +18,10 @@ import { Transaction } from 'src/transactions/transaction.entity'
       inject: [ConfigService],
       useFactory: (config: ConfigService) => {
         const isDevelopment = config.get('NODE_ENV') === 'development'
+        const dbPath = config.get<string>('DB_PATH')
         return {
-          name: config.get<string>('DB_NAME'),
-          database: config.get<string>('DB_PATH'),
           type: 'sqlite',
+          database: dbPath,
           logging: isDevelopment,
           synchronize: isDevelopment,
           entities: [Contract, Transaction]
@@ -32,16 +32,20 @@ import { Transaction } from 'src/transactions/transaction.entity'
       inject: [ConfigService],
       useFactory: (config: ConfigService) => {
         const isDevelopment = config.get('NODE_ENV') === 'development'
-        const username = config.get<string>('ANYBLOCK_DB_USER')
-        const password = config.get<string>('ANYBLOCK_DB_PASSWORD')
-        const host = config.get<string>('ANYBLOCK_DB_HOST')
-        const name = config.get<string>('ANYBLOCK_DB_NAME')
-        const port = config.get<string>('ANYBLOCK_DB_PORT')
+        const dbConnectionName = config.get<string>('ANYBLOCK_DB_CONNECTION_NAME')
+        const dbUserName = config.get<string>('ANYBLOCK_DB_USER')
+        const dbPassword = config.get<string>('ANYBLOCK_DB_PASSWORD')
+        const dbHost = config.get<string>('ANYBLOCK_DB_HOST')
+        const dbName = config.get<string>('ANYBLOCK_DB_NAME')
+        const dbPort = config.get<string>('ANYBLOCK_DB_PORT')
+        const dbURL = `postgresql://${dbUserName}:${dbPassword}@${dbHost}:${dbPort}/${dbName}`
 
         return {
+          name: dbConnectionName,
           type: 'postgres',
-          url: `postgresql://${username}:${password}@${host}:${port}/${name}`,
+          url: dbURL,
           logging: isDevelopment,
+          synchronize: false,
           ssl: {
             rejectUnauthorized: false
           }
