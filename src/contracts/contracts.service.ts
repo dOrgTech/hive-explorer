@@ -7,12 +7,11 @@ import { InjectModel } from '@nestjs/sequelize'
 export class ContractsService {
   constructor(@InjectModel(Contract) private contractModel: typeof Contract) {}
 
-  findAll() {
-    return this.contractModel.findAll()
+  async findAll() {
+    return await this.contractModel.findAll()
   }
 
   async create(address: string, contractType: string) {
-    const contract = await this.contractModel.create({ address, contract_type: contractType })
-    return contract
+    return await this.contractModel.create({ address, contract_type: contractType })
   }
 }

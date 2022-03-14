@@ -2,13 +2,18 @@ import { NestFactory } from '@nestjs/core'
 import { AppModule } from './app.module'
 import { Logger } from '@nestjs/common'
 import { ContractsService } from 'src/contracts/contracts.service'
+import { AnyblockService } from 'src/anyblock/anyblock.service'
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule)
   const contractService = app.get(ContractsService)
-  // await contractService.create('contract_address', 'ERC721')
-  // const contracts = await contractService.findAll()
-  // console.log('contracts => ', contracts)
+  await contractService.create('contract_address', 'ERC721')
+  const contracts = await contractService.findAll()
+  console.log('local contracts => ', contracts)
+
+  // const anyblockService = app.get(AnyblockService)
+  // const abContracts = await anyblockService.findAllContracts()
+  // console.log('any block contracts => ', abContracts)
 
   const port = process.env.PORT || 3000
   await app.listen(port)

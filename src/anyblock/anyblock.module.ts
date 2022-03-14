@@ -1,17 +1,9 @@
 import { Module } from '@nestjs/common'
 import { AnyblockService } from 'src/anyblock/anyblock.service'
-import { Sequelize } from 'sequelize-typescript'
-import { getConnectionToken } from '@nestjs/sequelize'
+import { AnyblockDatabaseModule } from 'src/anyblock/anyblock-database.module'
 
 @Module({
-  providers: [
-    {
-      provide: AnyblockService,
-      useFactory: (anyblockSequelize: Sequelize) => {
-        return new AnyblockService(anyblockSequelize)
-      },
-      inject: [getConnectionToken('anyblock_connection')]
-    }
-  ]
+  imports: [AnyblockDatabaseModule],
+  providers: [AnyblockService]
 })
 export class AnyblockModule {}
