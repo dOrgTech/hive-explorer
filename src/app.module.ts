@@ -6,42 +6,24 @@ import { ConfigModule, ConfigService } from '@nestjs/config'
 import { ContractsModule } from 'src/contracts/contracts.module'
 import { Contract } from 'src/contracts/contract.entity'
 import { AnyblockModule } from './anyblock/anyblock.module'
+import { Env } from 'src/_constants/env'
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: `.env.${process.env.NODE_ENV}`
+      envFilePath: `.env.${process.env[Env.NodeEnv]}`
     }),
     SequelizeModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => {
-        const dbPath = config.get<string>('DB_PATH')
+        const dbPath = config.get<string>(Env.DbPath)
         return {
           dialect: 'sqlite',
           storage: dbPath,
           autoLoadModels: true,
           synchronize: true,
           models: [Contract]
-        }
-      }
-    }),
-    SequelizeModule.forRootAsync({
-      inject: [ConfigService],
-      useFactory: (config: ConfigService) => {
-        const dbUserName = config.get<string>('ANYBLOCK_DB_USER')
-        const dbPassword = config.get<string>('ANYBLOCK_DB_PASSWORD')
-        const dbHost = config.get<string>('ANYBLOCK_DB_HOST')
-        const dbName = config.get<string>('ANYBLOCK_DB_NAME')
-        const dbPort = config.get<string>('ANYBLOCK_DB_PORT')
-        const dbURL = `postgresql://${dbUserName}:${dbPassword}@${dbHost}:${dbPort}/${dbName}`
-
-        return {
-          name: 'anyblock_connection',
-          dialect: 'postgres',
-          url: dbURL,
-          synchronize: false,
-          ssl: true
         }
       }
     }),

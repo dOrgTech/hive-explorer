@@ -6,8 +6,8 @@ import { Provider } from 'src/_constants/providers'
 export class AnyblockService {
   constructor(@Inject(Provider.AnyBlockDatabase) private db: Sequelize) {}
 
-  async findAllContracts() {
-    const query = `SELECT * FROM contract`
+  async findAllContractsCount() {
+    const query = `SELECT COUNT(*) FROM contract`
 
     return await this.db.query(query)
   }
