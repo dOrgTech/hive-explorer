@@ -1,4 +1,3 @@
-import { Module } from '@nestjs/common'
 import { Sequelize } from 'sequelize-typescript'
 import { ConfigService } from '@nestjs/config'
 import { Provider } from 'src/_constants/providers'
@@ -28,9 +27,3 @@ export const anyblockDatabaseProvider = [
     }
   }
 ]
-
-@Module({
-  providers: [...anyblockDatabaseProvider],
-  exports: [...anyblockDatabaseProvider]
-})
-export class AnyblockDatabaseModule {}

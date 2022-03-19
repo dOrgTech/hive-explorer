@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common'
 import { AnyblockService } from 'src/anyblock/anyblock.service'
-import { AnyblockDatabaseModule } from 'src/anyblock/anyblock-database.module'
+import { AnyblockDatabaseModule } from 'src/anyblock-database/anyblock-database.module'
 
 @Module({
   imports: [AnyblockDatabaseModule],
-  providers: [AnyblockService]
+  providers: [AnyblockService],
+  exports: [AnyblockService]
 })
 export class AnyblockModule {}

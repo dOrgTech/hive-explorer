@@ -1,12 +1,12 @@
-import { Module } from '@nestjs/common'
+import { Logger, Module } from '@nestjs/common'
 import { SequelizeModule } from '@nestjs/sequelize'
-import { AppController } from 'src/app.controller'
 import { AppService } from 'src/app.service'
 import { ConfigModule, ConfigService } from '@nestjs/config'
-import { ContractsModule } from 'src/contracts/contracts.module'
-import { Contract } from 'src/contracts/contract.entity'
+import { DumpedBlocksModule } from 'src/dumped-blocks/dumped-blocks.module'
+import { DumpedBlock } from 'src/dumped-blocks/dumped-block.entity'
 import { AnyblockModule } from './anyblock/anyblock.module'
 import { Env } from 'src/_constants/env'
+import { AppController } from 'src/app.controller'
 
 @Module({
   imports: [
@@ -23,14 +23,14 @@ import { Env } from 'src/_constants/env'
           storage: dbPath,
           autoLoadModels: true,
           synchronize: true,
-          models: [Contract]
+          models: [DumpedBlock]
         }
       }
     }),
-    ContractsModule,
-    AnyblockModule
+    AnyblockModule,
+    DumpedBlocksModule
   ],
   controllers: [AppController],
-  providers: [AppService]
+  providers: [AppService, Logger]
 })
 export class AppModule {}
