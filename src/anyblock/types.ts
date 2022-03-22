@@ -1,4 +1,4 @@
-export type BlockRecord = {
+export type ChainBlockRecord = {
   id: string
   number: number
   hash: string
@@ -23,4 +23,17 @@ export type BlockRecord = {
   seal_fields: string[]
   mix_hash: string
   base_fee_per_gas: number
+}
+
+export type ChainEventRecord = {
+  nft_name: string
+  txn_hash: string
+  txn_type: string
+  gas: number
+  value: number
+  from_hash: string
+  to_hash: string
+  token_id: number
+  block_number: number
+  timestamp: string
 }

@@ -1,12 +1,14 @@
 import { Logger, Module } from '@nestjs/common'
 import { SequelizeModule } from '@nestjs/sequelize'
-import { AppService } from 'src/app.service'
 import { ConfigModule, ConfigService } from '@nestjs/config'
+import { Env } from 'src/_constants/env'
+import { AppService } from 'src/app.service'
+import { AppController } from 'src/app.controller'
+import { AnyblockModule } from 'src/anyblock/anyblock.module'
 import { DumpedBlocksModule } from 'src/dumped-blocks/dumped-blocks.module'
 import { DumpedBlock } from 'src/dumped-blocks/dumped-block.entity'
-import { AnyblockModule } from './anyblock/anyblock.module'
-import { Env } from 'src/_constants/env'
-import { AppController } from 'src/app.controller'
+import { EventsModule } from 'src/events/events.module'
+import { Event } from 'src/events/event.entity'
 
 @Module({
   imports: [
@@ -23,11 +25,12 @@ import { AppController } from 'src/app.controller'
           storage: dbPath,
           autoLoadModels: true,
           synchronize: true,
-          models: [DumpedBlock]
+          models: [DumpedBlock, Event]
         }
       }
     }),
     AnyblockModule,
+    EventsModule,
     DumpedBlocksModule
   ],
   controllers: [AppController],
