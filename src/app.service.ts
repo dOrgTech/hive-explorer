@@ -19,29 +19,6 @@ export class AppService {
     return JSON.stringify({ message: 'Cent social index is running' })
   }
 
-  // [EXPERIMENTAL]
-  // This queries a bunch of AnyBlock ranges in parallel and dumps them at the same time
-  // We're adding a timeout here because we don't want to get throttled by the API and
-  // we don't want to overwhelm the framework and lead to dropped requests / logs
-  // 
-  async dump_fast() {
-    const blockRangeSize = parseInt(this.configService.get(Env.QueryBlockRangeSize), 10)
-    const blockRangeFloor = parseInt(this.configService.get(Env.QueryBlockRangeFloor), 10)
-    const lastChainBlock = await this.anyblockService.findLastBlock()
-    for(let i = 6000000, j=2000; i < 7000000; i+=blockRangeSize, j+=2000) {
-      setTimeout(() => { this.dump_fast_worker(i, i + blockRangeSize) }, j)
-    }
-  }
-
-  async dump_fast_worker(from: number, to: number) {
-    try {
-      const chainEvents = await this.anyblockService.findEventsByBlockRange({ from, to })
-      this.eventsService.bulkCreate(chainEvents)
-    } catch (error) {
-      this.logger.log(error.message)
-    }
-  }
-
   async dump() {
     // @TODO - clean up / refine this
     try {
