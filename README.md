@@ -20,6 +20,8 @@ The current tools we are using for are:
     * For `ANYBLOCK_DB_DATABASE` we're going to want to query `ethereum_ethereum_mainnet`.
 
 3. Finally, install / run the app as specified [below](#dev-environment) and if all goes well, the app should query AnyBlock to get the data we want and drop it into your local SQLite database in batches with the specified ranges.
+    * Once you run `yarn start:dev` to start querying by block range you can stop the sync and it will restart where it left off
+    * You can modify the `QUERY_BLOCK_RANGE_SIZE` to be higher or lower and tweak the speed of your sync... For now it's 1000 blocks per query, but that can be modified 
 
 4. Message us if you have any issues with or questions about this process!
 
