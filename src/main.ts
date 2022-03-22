@@ -8,9 +8,9 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule)
   const appService = app.get(AppService)
   setInterval(() => {
-    // @TODO - clean up / refine this
+    // @TODO - clean up / refine this process
     appService.dump()
-  }, 10_000)
+  }, 1000)
 
   // testing
   // await appService.test()

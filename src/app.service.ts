@@ -11,7 +11,7 @@ export class AppService {
     private readonly logger: Logger,
     private readonly configService: ConfigService,
     private readonly anyblockService: AnyblockService,
-    private readonly events: EventsService,
+    private readonly eventsService: EventsService,
     private readonly dumpedBlocksService: DumpedBlocksService
   ) {}
 
@@ -19,31 +19,37 @@ export class AppService {
     return JSON.stringify({ message: 'Cent social index is running' })
   }
 
-  async test() {
-    const events = await this.anyblockService.findEventsByBlockRange({ from: 14000000, to: 14000100 })
-    console.log('events => ', events)
-  }
-
   async dump() {
+    // @TODO - clean up / refine this
     try {
-      const blockRangeSize = parseInt(this.configService.get(Env.QueryBlockRangeSize), 100)
+      const blockRangeSize = parseInt(this.configService.get(Env.QueryBlockRangeSize), 10)
       const lastDumpedBlock = await this.dumpedBlocksService.findLastDumpedBlock()
       const blockRange = { from: null, to: null }
       blockRange.from = Boolean(lastDumpedBlock) ? lastDumpedBlock.number : 0
       blockRange.to = blockRange.from + blockRangeSize
 
       const lastChainBlock = await this.anyblockService.findLastBlock()
-
+      if (lastChainBlock.number <= blockRange.from) {
+        return
+      }
       if (lastChainBlock.number > blockRange.from && lastChainBlock.number < blockRange.to) {
+        blockRange.to = lastChainBlock.number
+      }
+
+      const lastChainBlockToDump = await this.anyblockService.findBlockByNumber(blockRange.to)
+      if (!Boolean(lastChainBlock)) {
         return
       }
 
-      // await this.dumpedBlocksService.create({
-      //   number: lastBlock.number,
-      //   hash: lastBlock.hash,
-      //   parent_hash: lastBlock.parent_hash,
-      //   timestamp: lastBlock.timestamp
-      // })
+      const chainEvents = await this.anyblockService.findEventsByBlockRange({ ...blockRange })
+
+      await this.eventsService.bulkCreate(chainEvents)
+      await this.dumpedBlocksService.create({
+        number: lastChainBlockToDump.number,
+        hash: lastChainBlockToDump.hash,
+        parent_hash: lastChainBlockToDump.parent_hash,
+        timestamp: lastChainBlockToDump.timestamp
+      })
     } catch (error) {
       this.logger.log(error.message)
     }
