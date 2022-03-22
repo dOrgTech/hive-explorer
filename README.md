@@ -19,7 +19,7 @@ The current tools we are using for are:
     * For `DB_PATH` you can do something like `./db/cent.dev.sqlite` — this is the local SQLite database that will get constructed for you.
     * For `ANYBLOCK_DB_DATABASE` we're going to want to query `ethereum_ethereum_mainnet`.
 
-3. Finally, install / run the app as specified [below](#dev-environment) and if all goes well, the app should query AnyBlock to get the data we want and drop it into your local SQLite database.
+3. Finally, install / run the app as specified [below](#dev-environment) and if all goes well, the app should query AnyBlock to get the data we want and drop it into your local SQLite database in batches with the specified ranges.
 
 4. Message us if you have any issues with or questions about this process!
 
@@ -82,6 +82,8 @@ WHERE
   timestamp < '2017-11-24'
 LIMIT 10
 ```
+
+This way we can save a lot of time, since we're not checking 5,000,000 blocks (30% of the corpus) that we're sure doesn't have any data we're looking for.
 
 ## Nest Framework
 

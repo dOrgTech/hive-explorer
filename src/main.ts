@@ -7,13 +7,7 @@ import { AppService } from 'src/app.service'
 async function bootstrap() {
   const app = await NestFactory.create(AppModule)
   const appService = app.get(AppService)
-  setInterval(() => {
-    // @TODO - clean up / refine this process
-    appService.dump()
-  }, 2000)
-
-  // testing
-  // await appService.test()
+  appService.dump()
 
   const port = process.env[Env.Port] || 3000
   await app.listen(port)
