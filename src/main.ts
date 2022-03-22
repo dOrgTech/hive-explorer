@@ -11,6 +11,10 @@ async function bootstrap() {
     // @TODO - clean up / refine this
     appService.dump()
   }, 10_000)
+
+  // testing
+  // await appService.test()
+
   const port = process.env[Env.Port] || 3000
   await app.listen(port)
   Logger.log(`Running on port:${port} in ${process.env.NODE_ENV} mode`)

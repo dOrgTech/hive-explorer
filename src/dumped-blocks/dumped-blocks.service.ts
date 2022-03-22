@@ -6,7 +6,11 @@ import { DumpedBlock } from 'src/dumped-blocks/dumped-block.entity'
 export class DumpedBlocksService {
   constructor(@InjectModel(DumpedBlock) private model: typeof DumpedBlock) {}
 
-  async create(block: { number: number; hash: string; parent_hash: string; timestamp: string }) {
-    return await this.model.create(block)
+  findLastDumpedBlock() {
+    return this.model.findOne({ order: [['id', 'DESC']] })
+  }
+
+  create(block: { number: number; hash: string; parent_hash: string; timestamp: string }) {
+    return this.model.create(block)
   }
 }
