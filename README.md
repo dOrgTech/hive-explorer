@@ -55,12 +55,38 @@ $ npm run test:cov
 ```
 
 ## Technical FAQ
-Place technical issues and how to solve them here
+
+Place technical issues and how to solve them here, as well as things to note when developing / utilizing this repo
+
+### Why 5000000 Block Floor?
+
+For now we're only querying data related to `ERC721` and `ERC1155` tokens. The first `ERC721` token according to this query is [CryptoKitties](https://etherscan.io/address/0x06012c8cf97bead5deae237070f9587f8e7a266d), which launched on Nov. 23, 2017
+
+``` SQL
+SELECT address, name, created_at
+FROM token
+WHERE 
+  (type = 'ERC721' OR type = 'ERC1155') AND
+  total_supply > 0
+ORDER BY created_at ASC
+LIMIT 10
+```
+
+From this, we can figure out which blocks were mined on that fateful day, and use a round number around then as our floor:
+
+``` SQL
+SELECT * 
+FROM block
+WHERE 
+  timestamp > '2017-11-23' AND 
+  timestamp < '2017-11-24'
+LIMIT 10
+```
 
 ## Nest Framework
 
 Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
 
-- Website - [https://nestjs.com](https://nestjs.com/)
+* Website - [https://nestjs.com](https://nestjs.com/)
 
 Nest is [MIT licensed](LICENSE).

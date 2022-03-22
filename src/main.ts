@@ -10,7 +10,7 @@ async function bootstrap() {
   setInterval(() => {
     // @TODO - clean up / refine this process
     appService.dump()
-  }, 1000)
+  }, 2000)
 
   // testing
   // await appService.test()

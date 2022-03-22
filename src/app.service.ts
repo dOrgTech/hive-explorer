@@ -23,9 +23,10 @@ export class AppService {
     // @TODO - clean up / refine this
     try {
       const blockRangeSize = parseInt(this.configService.get(Env.QueryBlockRangeSize), 10)
+      const blockRangeFloor = parseInt(this.configService.get(Env.QueryBlockRangeFloor), 10)
       const lastDumpedBlock = await this.dumpedBlocksService.findLastDumpedBlock()
       const blockRange = { from: null, to: null }
-      blockRange.from = Boolean(lastDumpedBlock) ? lastDumpedBlock.number : 0
+      blockRange.from = Boolean(lastDumpedBlock) ? lastDumpedBlock.number : blockRangeFloor
       blockRange.to = blockRange.from + blockRangeSize
 
       const lastChainBlock = await this.anyblockService.findLastBlock()
