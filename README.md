@@ -12,18 +12,26 @@ The current tools we are using for are:
 
 ## Get Local SQLite DB
 
-1. First, you will need an AnyBlock account. Create one [here](https://www.anyblockanalytics.com/).
+### Downloading Corpus Yourself
+
+Honestly, this method is *not* recommended since it takes a very long time to get the entire blockchain information. I would recommend following the full instructions [below](#Syncing-from-Downloaded-Corpus) to instead download the SQLite file which has information up to ~14.45m blocks and syncing the rest locally.
+
+But, if you want to do so, you can skip step #1 below and just start syncing from AnyBlock. You have been warned.
+
+### Syncing from Downloaded Corpus
+
+1. Get the SQLite file from [this link](<INSERT LINK>) and place the it within the directory as `./db/cent.dev.sqlite`
+
+2. You will need an AnyBlock account. Create one [here](https://www.anyblockanalytics.com/).
     * If you have any issues, ping me (Nikhil) with your email and I can add you to my account as a registered user.
 
-2. Next, create an `.env.development` file and use the format specified in `.env.example`, and fill in the fields as specified in AnyBlock.
+3. Next, create an `.env.development` file and use the format specified in `.env.example`, and fill in the fields as specified in AnyBlock.
     * For `DB_PATH` you can do something like `./db/cent.dev.sqlite` — this is the local SQLite database that will get constructed for you.
     * For `ANYBLOCK_DB_DATABASE` we're going to want to query `ethereum_ethereum_mainnet`.
 
-3. Finally, install / run the app as specified [below](#dev-environment) and if all goes well, the app should query AnyBlock to get the data we want and drop it into your local SQLite database in batches with the specified ranges.
+4. Finally, install / run the app as specified [below](#dev-environment) and if all goes well, the app should query AnyBlock to get the data we want and drop it into your local SQLite database in batches with the specified ranges.
     * Once you run `yarn start:dev` to start querying by block range you can stop the sync and it will restart where it left off
-    * You can modify the `QUERY_BLOCK_RANGE_SIZE` to be higher or lower and tweak the speed of your sync... For now it's 1000 blocks per query, but that can be modified 
-
-4. Message us if you have any issues with or questions about this process!
+    * You can modify the `QUERY_BLOCK_RANGE_SIZE` to be higher or lower and tweak the speed of your sync... For now it's 1000 blocks per query, but that can be modified
 
 ## Dev Environment
 
