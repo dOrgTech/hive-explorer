@@ -8,7 +8,7 @@ import { ChainBlockRecord, ChainEventRecord } from 'src/anyblock/types'
 export class AnyblockService {
   constructor(@Inject(Provider.AnyBlockDatabase) private db: Sequelize) {}
 
-  async findBlockByNumber(blockNumber: number): Promise<ChainBlockRecord> {
+  async findBlockByNumber(blockNumber: number): Promise<ChainBlockRecord | null> {
     const query = `SELECT * FROM block WHERE block.number = :number`
     const records = await this.db.query<ChainBlockRecord>(query, {
       type: QueryTypes.SELECT,
@@ -17,7 +17,7 @@ export class AnyblockService {
     return records[0] || null
   }
 
-  async findLastBlock(): Promise<ChainBlockRecord> {
+  async findLastBlock(): Promise<ChainBlockRecord | null> {
     const query = `SELECT * FROM block ORDER BY number DESC LIMIT 1`
     const records = await this.db.query<ChainBlockRecord>(query, { type: QueryTypes.SELECT })
     return records[0] || null
