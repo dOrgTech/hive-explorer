@@ -43,6 +43,7 @@ export class AppService {
         setTimeout(() => {
           this.dump()
         }, 10000)
+        return
       }
 
       const blockRange = { from: 0, to: 0 }
