@@ -33,6 +33,10 @@ But, if you want to do so, you can skip step #1 below and just start syncing fro
     * Once you run `yarn start:dev` to start querying by block range you can stop the sync and it will restart where it left off
     * You can modify the `QUERY_BLOCK_RANGE_SIZE` to be higher or lower and tweak the speed of your sync... For now it's 1000 blocks per query, but that can be modified
 
+### Accessing the SQLite database
+
+Okay, so you have the *huge* corpus of data (18gb). Now what? A SQLite databsae works just like a normal SQL database (same way of querying, with a few quirks at the margins) except instead of pointing to a remote address, you point it to a **file** instead when querying. You can check [this link](https://towardsdatascience.com/10-best-sql-editor-tools-in-the-market-126acd64ba06) to find some good tools for querying / editing SQL, all of which *should* have SQLite support. I personally use [SQLite Studio](https://sqlitestudio.pl/).
+
 ## Dev Environment
 
 ### Package Installation
