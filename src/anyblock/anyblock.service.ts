@@ -32,9 +32,10 @@ export class AnyblockService {
           (type = 'ERC721' OR type = 'ERC1155') AND
           total_supply > 0
     )
-    , erc721_events(nft_name, txn_hash, txn_type, from_hash, to_hash, token_id, block_number, timestamp) AS (
+    , erc721_events(nft_name, contract_hash, txn_hash, txn_type, from_hash, to_hash, token_id, block_number, timestamp) AS (
         SELECT
             erc721_addresses.name as nft_name,
+            erc721_addresses.address as contract_hash,
             event.transaction_hash as txn_hash,
             CASE
             WHEN event.args::json#>>'{0, hex}' = '0x0000000000000000000000000000000000000000' THEN 'mint'
@@ -56,6 +57,7 @@ export class AnyblockService {
     )
     SELECT
         erc721_events.nft_name,
+        erc721_events.contract_hash,
         erc721_events.txn_hash,
         erc721_events.txn_type,
         tx.gas_price as gas,

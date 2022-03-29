@@ -35,7 +35,7 @@ But, if you want to do so, you can skip step #1 below and just start syncing fro
 
 ### Accessing the SQLite database
 
-Okay, so you have the *huge* corpus of data (18gb). Now what? A SQLite databsae works just like a normal SQL database (same way of querying, with a few quirks at the margins) except instead of pointing to a remote address, you point it to a **file** instead when querying. You can check [this link](https://towardsdatascience.com/10-best-sql-editor-tools-in-the-market-126acd64ba06) to find some good tools for querying / editing SQL, all of which *should* have SQLite support. I personally use [SQLite Studio](https://sqlitestudio.pl/).
+Okay, so you have the *huge* corpus of data (18gb). Now what? A SQLite database works just like a normal SQL database (same way of querying, with a few quirks at the margins) except instead of pointing to a remote address, you point it to a **file** instead when querying. You can check [this link](https://towardsdatascience.com/10-best-sql-editor-tools-in-the-market-126acd64ba06) to find some good tools for querying / editing SQL, all of which *should* have SQLite support. I personally use [SQLite Studio](https://sqlitestudio.pl/).
 
 ## Dev Environment
 

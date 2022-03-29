@@ -5,6 +5,8 @@ export class Event extends Model {
   @Column({ type: DataType.NUMBER })
   block_number: number
   @Column({ type: DataType.TEXT })
+  contract_hash: string
+  @Column({ type: DataType.TEXT })
   nft_name: string
   @Column({ type: DataType.TEXT })
   txn_hash: string

@@ -27,6 +27,7 @@ export type ChainBlockRecord = {
 
 export type ChainEventRecord = {
   nft_name: string
+  contract_hash: string
   txn_hash: string
   txn_type: string
   gas: number
