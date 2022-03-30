@@ -24,6 +24,7 @@ export class AppService {
     try {
       const blockRangeSize = parseInt(this.configService.get(Env.QueryBlockRangeSize), 10)
       const blockRangeFloor = parseInt(this.configService.get(Env.QueryBlockRangeFloor), 10)
+      const blockRangeCeiling = parseInt(this.configService.get(Env.QueryBlockRangeCeiling), 10)
 
       if (!Boolean(blockRangeSize)) {
         this.logger.error('QUERY_BLOCK_RANGE_SIZE is not a number or is missing from environment variables')
@@ -35,11 +36,14 @@ export class AppService {
         return
       }
 
-      const lastChainBlock = await this.anyblockService.findLastBlock()
+      const lastChainBlockNumber = 
+        Boolean(blockRangeCeiling) ? 
+          blockRangeCeiling : 
+          (await this.anyblockService.findLastBlock()).number
       const lastDumpedBlock = await this.dumpedBlocksService.findLastDumpedBlock()
       const hasLastDumpedBlock = Boolean(lastDumpedBlock)
 
-      if (hasLastDumpedBlock && lastChainBlock.number < lastDumpedBlock.number + blockRangeSize) {
+      if (hasLastDumpedBlock && lastChainBlockNumber < lastDumpedBlock.number + blockRangeSize) {
         setTimeout(() => {
           this.dump()
         }, 10000)
@@ -51,9 +55,9 @@ export class AppService {
         hasLastDumpedBlock && lastDumpedBlock.number > blockRangeFloor ? lastDumpedBlock.number : blockRangeFloor
 
       blockRange.to =
-        blockRange.from + blockRangeSize < lastChainBlock.number
+        blockRange.from + blockRangeSize < lastChainBlockNumber
           ? blockRange.from + blockRangeSize
-          : lastChainBlock.number
+          : lastChainBlockNumber
 
       const chainBlockToDump = await this.anyblockService.findBlockByNumber(blockRange.to)
       const chainEvents = await this.anyblockService.findEventsByBlockRange({ ...blockRange })
