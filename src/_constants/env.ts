@@ -4,6 +4,7 @@ export enum Env {
   DbPath = 'DB_PATH',
   QueryBlockRangeSize = 'QUERY_BLOCK_RANGE_SIZE',
   QueryBlockRangeFloor = 'QUERY_BLOCK_RANGE_FLOOR',
+  QueryBlockRangeCeiling = 'QUERY_BLOCK_RANGE_CEILING',
   AnyblockDbHost = 'ANYBLOCK_DB_HOST',
   AnyblockDbPort = 'ANYBLOCK_DB_PORT',
   AnyblockDbUsername = 'ANYBLOCK_DB_USERNAME',
