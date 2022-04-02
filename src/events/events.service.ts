@@ -29,6 +29,6 @@ export class EventsService {
   }
 
   bulkCreate(records: EventCreateRecord[]) {
-    this.eventRepository.bulkCreate(records)
+    return this.eventRepository.bulkCreate(records)
   }
 }

@@ -3,10 +3,7 @@ import { DumpedBlock } from 'src/dumped-blocks/dumped-block.entity'
 import { Provider } from 'src/_constants/providers'
 
 type DumpedBlockCreateRecord = {
-  number: number
-  hash: string
-  parent_hash: string
-  timestamp: string
+  number: string
 }
 
 @Injectable()

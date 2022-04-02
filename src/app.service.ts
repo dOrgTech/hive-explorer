@@ -43,9 +43,10 @@ export class AppService {
 
       const lastDumpedBlock = await this.dumpedBlocksService.findLastDumpedBlock()
       const hasLastDumpedBlock = Boolean(lastDumpedBlock)
+      const lastDumpedBlockNumber = hasLastDumpedBlock ? parseInt(lastDumpedBlock.number, 10) : -1
 
       // don't run again if there is a ceiling and if we have reached the last block
-      const hasReachedCeiling = hasRangeCeiling && hasLastDumpedBlock && lastDumpedBlock.number === blockRangeCeiling
+      const hasReachedCeiling = hasRangeCeiling && hasLastDumpedBlock && lastDumpedBlockNumber === blockRangeCeiling
       if (hasReachedCeiling) {
         this.logger.warn(`Reached ${Env.QueryBlockRangeCeiling}. Process complete.`)
         return
@@ -56,7 +57,10 @@ export class AppService {
         : (await this.anyblockService.findLastBlock())?.number
 
       const shouldScheduleNextRun =
-        !hasRangeCeiling && hasLastDumpedBlock && lastChainBlockNumber < lastDumpedBlock.number + blockRangeSize
+        !hasRangeCeiling && hasLastDumpedBlock && lastChainBlockNumber < lastDumpedBlockNumber + blockRangeSize
+      console.log('lastChainBlockNumber = ', lastChainBlockNumber, typeof lastChainBlockNumber)
+      console.log('lastDumpedBlock = ', lastDumpedBlockNumber, typeof lastDumpedBlockNumber)
+      console.log('lastDumpedBlockNumber + blockRangeSize = ', lastDumpedBlockNumber + blockRangeSize)
       if (shouldScheduleNextRun) {
         const timeout = 10_000
         this.logger.log(`Scheduling next run in ${timeout} ms.`)
@@ -68,7 +72,7 @@ export class AppService {
 
       const blockRange = { from: 0, to: 0 }
       blockRange.from =
-        hasLastDumpedBlock && lastDumpedBlock.number > blockRangeFloor ? lastDumpedBlock.number : blockRangeFloor
+        hasLastDumpedBlock && lastDumpedBlockNumber > blockRangeFloor ? lastDumpedBlockNumber : blockRangeFloor
 
       blockRange.to =
         blockRange.from + blockRangeSize < lastChainBlockNumber
@@ -79,12 +83,7 @@ export class AppService {
       const chainEvents = await this.anyblockService.findEventsByBlockRange({ ...blockRange })
 
       await this.eventsService.bulkCreate(chainEvents)
-      await this.dumpedBlocksService.create({
-        number: chainBlockToDump.number,
-        hash: chainBlockToDump.hash,
-        parent_hash: chainBlockToDump.parent_hash,
-        timestamp: chainBlockToDump.timestamp
-      })
+      await this.dumpedBlocksService.create({ number: chainBlockToDump.number })
 
       this.dump()
     } catch (error) {

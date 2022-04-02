@@ -1,6 +1,6 @@
 export type ChainBlockRecord = {
   id: string
-  number: number
+  number: string
   hash: string
   parent_hash: string
   nonce: string
