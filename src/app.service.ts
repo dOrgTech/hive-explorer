@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common'
+import _ from 'lodash'
 import { AnyblockService } from 'src/anyblock/anyblock.service'
 import { EventsService } from 'src/events/events.service'
 import { DumpedBlocksService } from 'src/dumped-blocks/dumped-blocks.service'
@@ -23,12 +24,14 @@ export class AppService {
     // await this.dumpedBlocksService.create({ number: 1000 })
 
     const lastDumpedBlock = await this.dumpedBlocksService.findLastDumpedBlock()
-    console.log('lastDumpedBlock.number', lastDumpedBlock?.number, typeof lastDumpedBlock?.number)
-    // console.log('lastDumpedBlock => ', lastDumpedBlock, typeof lastDumpedBlock.id)
+    console.log('lastDumpedBlockNumber', lastDumpedBlock?.number, typeof lastDumpedBlock?.number)
 
     const blockChainLastBlock = await this.anyblockService.findLastBlock()
-    console.log('blockChainLastBlock => ', blockChainLastBlock, typeof blockChainLastBlock.timestamp)
-    console.log('blockChainLastBlock.number', blockChainLastBlock?.number, typeof blockChainLastBlock?.number)
+    console.log('blockChainLastBlock => ', blockChainLastBlock)
+    // console.log('blockChainLastBlock.number', blockChainLastBlock?.number, typeof blockChainLastBlock?.number)
+
+    const events = await this.anyblockService.findEventsByBlockRange({ from: 5000000, to: 5001000 })
+    console.log(events[0])
   }
 
   async dump() {
@@ -55,20 +58,25 @@ export class AppService {
 
       const lastDumpedBlock = await this.dumpedBlocksService.findLastDumpedBlock()
       const hasLastDumpedBlock = Boolean(lastDumpedBlock)
+      const lastDumpedBlockNumber = hasLastDumpedBlock ? parseInt(lastDumpedBlock.number, 10) : 0
 
       // don't run again if there is a ceiling and if we have reached the last block
-      const hasReachedCeiling = hasRangeCeiling && hasLastDumpedBlock && lastDumpedBlock.number === blockRangeCeiling
+      const hasReachedCeiling = hasRangeCeiling && hasLastDumpedBlock && lastDumpedBlockNumber === blockRangeCeiling
       if (hasReachedCeiling) {
         this.logger.warn(`Reached ${Env.QueryBlockRangeCeiling}. Process complete.`)
         return
       }
 
-      const lastChainBlockNumber = hasRangeCeiling
-        ? blockRangeCeiling
-        : (await this.anyblockService.findLastBlock())?.number
+      let lastChainBlockNumber = 0
+      if (hasRangeCeiling) {
+        lastChainBlockNumber = blockRangeCeiling
+      } else {
+        const lastChainBlock = await this.anyblockService.findLastBlock()
+        lastChainBlockNumber = parseInt(lastChainBlock.number, 10)
+      }
 
       const shouldScheduleNextRun =
-        !hasRangeCeiling && hasLastDumpedBlock && lastChainBlockNumber < lastDumpedBlock.number + blockRangeSize
+        !hasRangeCeiling && hasLastDumpedBlock && lastChainBlockNumber < lastDumpedBlockNumber + blockRangeSize
 
       if (shouldScheduleNextRun) {
         const timeout = 10_000
@@ -81,7 +89,7 @@ export class AppService {
 
       const blockRange = { from: 0, to: 0 }
       blockRange.from =
-        hasLastDumpedBlock && lastDumpedBlock.number > blockRangeFloor ? lastDumpedBlock.number : blockRangeFloor
+        hasLastDumpedBlock && lastDumpedBlockNumber > blockRangeFloor ? lastDumpedBlockNumber : blockRangeFloor
 
       blockRange.to =
         blockRange.from + blockRangeSize < lastChainBlockNumber

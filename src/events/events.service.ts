@@ -1,20 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common'
 import { Event } from 'src/events/event.entity'
 import { Provider } from 'src/_constants/providers'
-
-export type EventCreateRecord = {
-  nft_name: string
-  contract_hash: string
-  txn_hash: string
-  txn_type: string
-  gas: number
-  value: number
-  from_hash: string
-  to_hash: string
-  token_id: number
-  block_number: number
-  timestamp: string
-}
+import { ChainEventRecord } from 'src/anyblock/types'
 
 @Injectable()
 export class EventsService {
@@ -24,11 +11,11 @@ export class EventsService {
     return this.eventRepository.findAll()
   }
 
-  create(record: EventCreateRecord) {
+  create(record: ChainEventRecord) {
     return this.eventRepository.create(record)
   }
 
-  bulkCreate(records: EventCreateRecord[]) {
+  bulkCreate(records: ChainEventRecord[]) {
     return this.eventRepository.bulkCreate(records)
   }
 }

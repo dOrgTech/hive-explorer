@@ -12,6 +12,7 @@ export class AnyblockService {
     const query = `SELECT * FROM block WHERE block.number = :number`
     const records = await this.db.query<ChainBlockRecord>(query, {
       type: QueryTypes.SELECT,
+      raw: true,
       replacements: { number: blockNumber }
     })
     return records[0] || null
@@ -19,7 +20,7 @@ export class AnyblockService {
 
   async findLastBlock(): Promise<ChainBlockRecord | null> {
     const query = `SELECT * FROM block ORDER BY number DESC LIMIT 1`
-    const records = await this.db.query<ChainBlockRecord>(query, { type: QueryTypes.SELECT })
+    const records = await this.db.query<ChainBlockRecord>(query, { type: QueryTypes.SELECT, raw: true })
     return records[0] || null
   }
 
@@ -73,6 +74,7 @@ export class AnyblockService {
     `
     return this.db.query<ChainEventRecord>(query, {
       type: QueryTypes.SELECT,
+      raw: true,
       replacements: { from: blockRange.from, to: blockRange.to }
     })
   }
