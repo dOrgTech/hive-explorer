@@ -19,6 +19,18 @@ export class AppService {
     return JSON.stringify({ message: 'Cent social index is running' })
   }
 
+  async test() {
+    // await this.dumpedBlocksService.create({ number: 1000 })
+
+    const lastDumpedBlock = await this.dumpedBlocksService.findLastDumpedBlock()
+    console.log('lastDumpedBlock.number', lastDumpedBlock?.number, typeof lastDumpedBlock?.number)
+    // console.log('lastDumpedBlock => ', lastDumpedBlock, typeof lastDumpedBlock.id)
+
+    const blockChainLastBlock = await this.anyblockService.findLastBlock()
+    console.log('blockChainLastBlock => ', blockChainLastBlock, typeof blockChainLastBlock.timestamp)
+    console.log('blockChainLastBlock.number', blockChainLastBlock?.number, typeof blockChainLastBlock?.number)
+  }
+
   async dump() {
     try {
       const blockRangeSize = parseInt(this.configService.get(Env.QueryBlockRangeSize), 10)
@@ -43,10 +55,9 @@ export class AppService {
 
       const lastDumpedBlock = await this.dumpedBlocksService.findLastDumpedBlock()
       const hasLastDumpedBlock = Boolean(lastDumpedBlock)
-      const lastDumpedBlockNumber = hasLastDumpedBlock ? parseInt(lastDumpedBlock.number, 10) : -1
 
       // don't run again if there is a ceiling and if we have reached the last block
-      const hasReachedCeiling = hasRangeCeiling && hasLastDumpedBlock && lastDumpedBlockNumber === blockRangeCeiling
+      const hasReachedCeiling = hasRangeCeiling && hasLastDumpedBlock && lastDumpedBlock.number === blockRangeCeiling
       if (hasReachedCeiling) {
         this.logger.warn(`Reached ${Env.QueryBlockRangeCeiling}. Process complete.`)
         return
@@ -57,10 +68,8 @@ export class AppService {
         : (await this.anyblockService.findLastBlock())?.number
 
       const shouldScheduleNextRun =
-        !hasRangeCeiling && hasLastDumpedBlock && lastChainBlockNumber < lastDumpedBlockNumber + blockRangeSize
-      console.log('lastChainBlockNumber = ', lastChainBlockNumber, typeof lastChainBlockNumber)
-      console.log('lastDumpedBlock = ', lastDumpedBlockNumber, typeof lastDumpedBlockNumber)
-      console.log('lastDumpedBlockNumber + blockRangeSize = ', lastDumpedBlockNumber + blockRangeSize)
+        !hasRangeCeiling && hasLastDumpedBlock && lastChainBlockNumber < lastDumpedBlock.number + blockRangeSize
+
       if (shouldScheduleNextRun) {
         const timeout = 10_000
         this.logger.log(`Scheduling next run in ${timeout} ms.`)
@@ -72,7 +81,7 @@ export class AppService {
 
       const blockRange = { from: 0, to: 0 }
       blockRange.from =
-        hasLastDumpedBlock && lastDumpedBlockNumber > blockRangeFloor ? lastDumpedBlockNumber : blockRangeFloor
+        hasLastDumpedBlock && lastDumpedBlock.number > blockRangeFloor ? lastDumpedBlock.number : blockRangeFloor
 
       blockRange.to =
         blockRange.from + blockRangeSize < lastChainBlockNumber

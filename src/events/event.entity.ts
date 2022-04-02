@@ -22,6 +22,6 @@ export class Event extends Model {
   to_hash: string
   @Column({ type: DataType.TEXT })
   token_id: number
-  @Column({ type: DataType.TEXT })
-  timestamp: string
+  @Column({ type: DataType.TIME })
+  timestamp: Date
 }

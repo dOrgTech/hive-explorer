@@ -19,8 +19,8 @@ export const appDatabaseProvider = [
 
       const sequelize = new Sequelize(url, { dialect: 'postgres' })
       sequelize.addModels([DumpedBlock, Event])
+      // @TODO: maybe we don't need to sync in production (find a way to do migrations)
       await sequelize.sync()
-
       return sequelize
     }
   }
