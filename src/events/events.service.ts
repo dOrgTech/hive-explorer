@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common'
-import { InjectModel } from '@nestjs/sequelize'
+import { Inject, Injectable } from '@nestjs/common'
 import { Event } from 'src/events/event.entity'
+import { Provider } from 'src/_constants/providers'
 
 export type EventCreateRecord = {
   nft_name: string
@@ -18,17 +18,17 @@ export type EventCreateRecord = {
 
 @Injectable()
 export class EventsService {
-  constructor(@InjectModel(Event) private model: typeof Event) {}
+  constructor(@Inject(Provider.EventsRepository) private eventRepository: typeof Event) {}
 
   findAll() {
-    return this.model.findAll()
+    return this.eventRepository.findAll()
   }
 
   create(record: EventCreateRecord) {
-    return this.model.create(record)
+    return this.eventRepository.create(record)
   }
 
   bulkCreate(records: EventCreateRecord[]) {
-    this.model.bulkCreate(records)
+    this.eventRepository.bulkCreate(records)
   }
 }

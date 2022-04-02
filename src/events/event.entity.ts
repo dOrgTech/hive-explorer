@@ -2,25 +2,25 @@ import { Table, Model, Column, DataType } from 'sequelize-typescript'
 
 @Table({ tableName: 'events' })
 export class Event extends Model {
-  @Column({ type: DataType.NUMBER })
+  @Column
   block_number: number
-  @Column({ type: DataType.TEXT })
+  @Column
   contract_hash: string
-  @Column({ type: DataType.TEXT })
+  @Column
   nft_name: string
-  @Column({ type: DataType.TEXT })
+  @Column
   txn_hash: string
-  @Column({ type: DataType.TEXT })
+  @Column
   txn_type: string
-  @Column({ type: DataType.NUMBER })
+  @Column
   gas: number
-  @Column({ type: DataType.NUMBER })
+  @Column
   value: number
-  @Column({ type: DataType.TEXT })
+  @Column
   from_hash: string
-  @Column({ type: DataType.TEXT })
+  @Column
   to_hash: string
-  @Column({ type: DataType.TEXT })
+  @Column
   token_id: number
   @Column({ type: DataType.TIME })
   timestamp: Date

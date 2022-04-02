@@ -6,6 +6,7 @@
 /db
 
 # ENV
+.env
 .env.development
 .env.production
 

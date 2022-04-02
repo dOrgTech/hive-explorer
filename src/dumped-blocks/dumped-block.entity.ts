@@ -3,12 +3,12 @@ import { Table, Model, Column, DataType, Unique } from 'sequelize-typescript'
 @Table({ tableName: 'dumped_blocks' })
 export class DumpedBlock extends Model {
   @Unique
-  @Column({ type: DataType.NUMBER })
+  @Column
   number: number
   @Unique
-  @Column({ type: DataType.TEXT })
+  @Column
   hash: string
-  @Column({ type: DataType.TEXT })
+  @Column
   parent_hash: string
   @Column({ type: DataType.TIME })
   timestamp: string

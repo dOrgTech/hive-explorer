@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  cent-db:
+    image: postgres
+    container_name: cent-db
+    ports:
+      - ${DB_PORT}:${DB_CONTAINER_PORT}
+    environment:
+      - POSTGRES_USER=${DB_USERNAME}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_DATABASE}
+      - PG_DATA=/var/lib/postgresql/data
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: on-failure
+
+volumes:
+  pgdata:

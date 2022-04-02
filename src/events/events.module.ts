@@ -1,11 +1,9 @@
 import { Module } from '@nestjs/common'
-import { SequelizeModule } from '@nestjs/sequelize'
-import { Event } from 'src/events/event.entity'
 import { EventsService } from 'src/events/events.service'
+import { eventsProviders } from 'src/events/eventsProviders'
 
 @Module({
-  imports: [SequelizeModule.forFeature([Event])],
-  providers: [EventsService],
+  providers: [...eventsProviders, EventsService],
   exports: [EventsService]
 })
 export class EventsModule {}

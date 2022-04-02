@@ -88,7 +88,6 @@ export class AppService {
 
       this.dump()
     } catch (error) {
-      console.log(error)
       this.logger.error(error.message)
     }
   }
