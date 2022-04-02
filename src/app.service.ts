@@ -20,20 +20,6 @@ export class AppService {
     return JSON.stringify({ message: 'Cent social index is running' })
   }
 
-  async test() {
-    // await this.dumpedBlocksService.create({ number: 1000 })
-
-    const lastDumpedBlock = await this.dumpedBlocksService.findLastDumpedBlock()
-    console.log('lastDumpedBlockNumber', lastDumpedBlock?.number, typeof lastDumpedBlock?.number)
-
-    const blockChainLastBlock = await this.anyblockService.findLastBlock()
-    console.log('blockChainLastBlock => ', blockChainLastBlock)
-    // console.log('blockChainLastBlock.number', blockChainLastBlock?.number, typeof blockChainLastBlock?.number)
-
-    const events = await this.anyblockService.findEventsByBlockRange({ from: 5000000, to: 5001000 })
-    console.log(events[0])
-  }
-
   async dump() {
     try {
       const blockRangeSize = parseInt(this.configService.get(Env.QueryBlockRangeSize), 10)
