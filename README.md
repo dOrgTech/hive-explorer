@@ -8,36 +8,12 @@ The current tools we are using for are:
 
 * `AnyBlock` for SQL queries of on-chain data
 * `Nest.js` for setting up a pluggable architecture around modules to easily change data sources / output if necessary
-* `SQLite` for hosting the data we're interested in (transfer information) for the initial exploration
-
-## Get Local SQLite DB
-
-### Downloading Corpus Yourself
-
-Honestly, this method is *not* recommended since it takes a very long time to get the entire blockchain information. I would recommend following the full instructions [below](#Syncing-from-Downloaded-Corpus) to instead download the SQLite file which has information up to ~14.45m blocks and syncing the rest locally.
-
-But, if you want to do so, you can skip step #1 below and just start syncing from AnyBlock. You have been warned.
-
-### Syncing from Downloaded Corpus
-
-1. Get the SQLite file from [this link](<INSERT LINK>) and place the it within the directory as `./db/cent.dev.sqlite`
-
-2. You will need an AnyBlock account. Create one [here](https://www.anyblockanalytics.com/).
-    * If you have any issues, ping me (Nikhil) with your email and I can add you to my account as a registered user.
-
-3. Next, create an `.env.development` file and use the format specified in `.env.example`, and fill in the fields as specified in AnyBlock.
-    * For `DB_PATH` you can do something like `./db/cent.dev.sqlite` — this is the local SQLite database that will get constructed for you.
-    * For `ANYBLOCK_DB_DATABASE` we're going to want to query `ethereum_ethereum_mainnet`.
-
-4. Finally, install / run the app as specified [below](#dev-environment) and if all goes well, the app should query AnyBlock to get the data we want and drop it into your local SQLite database in batches with the specified ranges.
-    * Once you run `yarn start:dev` to start querying by block range you can stop the sync and it will restart where it left off
-    * You can modify the `QUERY_BLOCK_RANGE_SIZE` to be higher or lower and tweak the speed of your sync... For now it's 1000 blocks per query, but that can be modified
-
-### Accessing the SQLite database
-
-Okay, so you have the *huge* corpus of data (18gb). Now what? A SQLite database works just like a normal SQL database (same way of querying, with a few quirks at the margins) except instead of pointing to a remote address, you point it to a **file** instead when querying. You can check [this link](https://towardsdatascience.com/10-best-sql-editor-tools-in-the-market-126acd64ba06) to find some good tools for querying / editing SQL, all of which *should* have SQLite support. I personally use [SQLite Studio](https://sqlitestudio.pl/).
+* `Docker` for setting up a local postgres database
 
 ## Dev Environment
+
+### Dependencies
+- You need to install [Docker](https://docs.docker.com/get-docker/) in order to have local postgres server running locally
 
 ### Package Installation
 
@@ -55,6 +31,12 @@ $ yarn start
 $ yarn start:dev
 ```
 
+### Stopping Postgres Docker Container
+
+```bash
+$ yarn db:dev:stop
+```
+
 ### Test
 
 ```bash
@@ -70,7 +52,13 @@ $ npm run test:cov
 
 ## Technical FAQ
 
-Place technical issues and how to solve them here, as well as things to note when developing / utilizing this repo
+### How do start the local database from scratch ?
+You need to stop the docker container (see above)
+- UI: From your docker application dashboard -> volumes, remove cent-social-index_pgdata volume
+- Bash:
+```bash
+$ docker volume rm cent-social-index_pgdata
+```
 
 ### Why 5000000 Block Floor?
 
@@ -79,7 +67,7 @@ For now we're only querying data related to `ERC721` and `ERC1155` tokens. The f
 ``` SQL
 SELECT address, name, created_at
 FROM token
-WHERE 
+WHERE
   (type = 'ERC721' OR type = 'ERC1155') AND
   total_supply > 0
 ORDER BY created_at ASC
@@ -89,20 +77,13 @@ LIMIT 10
 From this, we can figure out which blocks were mined on that fateful day, and use a round number around then as our floor:
 
 ``` SQL
-SELECT * 
+SELECT *
 FROM block
-WHERE 
-  timestamp > '2017-11-23' AND 
+WHERE
+  timestamp > '2017-11-23' AND
   timestamp < '2017-11-24'
 LIMIT 10
 ```
 
 This way we can save a lot of time, since we're not checking 5,000,000 blocks (30% of the corpus) that we're sure doesn't have any data we're looking for.
 
-## Nest Framework
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-* Website - [https://nestjs.com](https://nestjs.com/)
-
-Nest is [MIT licensed](LICENSE).

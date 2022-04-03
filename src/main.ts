@@ -9,7 +9,7 @@ async function bootstrap() {
   const appService = app.get(AppService)
   appService.dump()
 
-  const port = process.env[Env.Port] || 3000
+  const port = process.env[Env.AppPort] || 5001
   await app.listen(port)
   Logger.log(`Running on port:${port} in ${process.env.NODE_ENV} mode`)
 }

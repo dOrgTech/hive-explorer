@@ -1,7 +1,11 @@
 export enum Env {
   NodeEnv = 'NODE_ENV',
-  Port = 'PORT',
-  DbPath = 'DB_PATH',
+  AppPort = 'PORT',
+  AppDbHost = 'DB_HOST',
+  AppDbDatabase = 'DB_DATABASE',
+  AppDbPort = 'DB_PORT',
+  AppDbUsername = 'DB_USERNAME',
+  AppDbPassword = 'DB_PASSWORD',
   QueryBlockRangeSize = 'QUERY_BLOCK_RANGE_SIZE',
   QueryBlockRangeFloor = 'QUERY_BLOCK_RANGE_FLOOR',
   QueryBlockRangeCeiling = 'QUERY_BLOCK_RANGE_CEILING',

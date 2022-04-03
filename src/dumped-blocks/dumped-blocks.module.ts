@@ -1,11 +1,9 @@
 import { Module } from '@nestjs/common'
-import { SequelizeModule } from '@nestjs/sequelize'
+import { dumpedBlocksProviders } from 'src/dumped-blocks/dumped-blocks.providers'
 import { DumpedBlocksService } from 'src/dumped-blocks/dumped-blocks.service'
-import { DumpedBlock } from 'src/dumped-blocks/dumped-block.entity'
 
 @Module({
-  imports: [SequelizeModule.forFeature([DumpedBlock])],
-  providers: [DumpedBlocksService],
+  providers: [...dumpedBlocksProviders, DumpedBlocksService],
   exports: [DumpedBlocksService]
 })
 export class DumpedBlocksModule {}
