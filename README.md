@@ -106,8 +106,8 @@ CSV HEADER;
 ```sql
 CREATE INDEX sender ON events (from_hash);
 CREATE INDEX recipient ON events (to_hash);
-CREATE INDEX contract ON events (nft_name);
-CREATE INDEX members ON events (nft_name, to_hash);
+CREATE INDEX contract ON events (contract_hash);
+CREATE INDEX members ON events (contract_hash, to_hash);
 ```
 
 6. Check the [`graph-research` repo](https://github.com/cent-inc/graph-research) for a further auxillary table to create (`collection_owner`) which is a user <> collection pair to map a user to a collection regardless of # of NFTs they have in that collection.
