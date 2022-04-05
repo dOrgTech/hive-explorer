@@ -1,5 +1,6 @@
 export enum Env {
   NodeEnv = 'NODE_ENV',
+  RunDump = 'RUN_DUMP',
   AppPort = 'PORT',
   AppDbHost = 'DB_HOST',
   AppDbDatabase = 'DB_DATABASE',

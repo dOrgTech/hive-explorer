@@ -11,6 +11,7 @@
     "server:build": "lerna exec yarn build",
     "server:start": "lerna exec yarn start",
     "server:start:dev": "lerna exec --scope @cent-social-index/server --scope @cent-social-index/server yarn 'start:dev'",
+    "server:start:dev:dump": "lerna exec --scope @cent-social-index/server --scope @cent-social-index/server yarn 'start:dev:dump'",
     "server:stop:dev": "lerna exec --scope @cent-social-index/server yarn 'db:dev:stop'",
     "server:start:debug": "lerna exec --scope @cent-social-index/server yarn 'star:debug'",
     "server:start:prod": "lerna exec --scope @cent-social-index/server yarn 'start:prod'",

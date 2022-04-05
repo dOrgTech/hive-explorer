@@ -11,6 +11,7 @@
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "cross-env NODE_ENV=development  nest start",
     "start:dev": "yarn db:dev:start && cross-env NODE_ENV=development nest start --watch",
+    "start:dev:dump": "yarn db:dev:start && cross-env NODE_ENV=development RUN_DUMP=true nest start --watch",
     "stop:dev": "yarn db:dev:stop",
     "start:debug": "yarn db:dev:start && cross-env NODE_ENV=development  nest start --debug --watch",
     "start:prod": "node dist/main",

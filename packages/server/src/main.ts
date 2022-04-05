@@ -7,7 +7,10 @@ import { AppService } from 'src/app.service'
 async function bootstrap() {
   const app = await NestFactory.create(AppModule)
   const appService = app.get(AppService)
-  // appService.dump()
+  if (process.env[Env.RunDump] === 'true') {
+    console.log('here!!')
+    appService.dump()
+  }
 
   const port = process.env[Env.AppPort] || 5001
   await app.listen(port)
