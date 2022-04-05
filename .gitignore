@@ -1,14 +1,14 @@
 # Compiled output
-/dist
-/node_modules
+packages/server/dist
 
-# DB
-/db
+# dependencies
+/node_modules
+packages/*/node_modules
 
 # ENV
-.env
-.env.development
-.env.production
+packages/server/.env
+packages/server/.env.development
+packages/server/.env.production
 
 # Logs
 logs
@@ -23,8 +23,8 @@ lerna-debug.log*
 .DS_Store
 
 # Tests
-/coverage
-/.nyc_output
+packages/server/coverage
+packages/server/.nyc_output
 
 # IDEs and editors
 /.idea
