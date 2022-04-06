@@ -17,7 +17,7 @@ export class AppService {
   ) {}
 
   ping() {
-    return JSON.stringify({ message: 'Cent social index is running' })
+    return JSON.stringify({ message: 'Cent social index server is running' })
   }
 
   async dump() {

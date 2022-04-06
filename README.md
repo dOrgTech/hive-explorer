@@ -74,6 +74,20 @@ $ yarn client:test
 
 ## Technical FAQ
 
+### How do I install npm packages ?
+This monorepo makes use of yarn workspaces you'll find both server and client applications under the /packages folder
+* The client package is named as: "@cent-social-index/client"
+* The server package is names as: "@cent-social-index/server"
+
+in order to install a new npm package:
+```bash
+$ yarn workspace [name-of-package] add [name-of-npm-package]
+
+# for example installing lodash on the client would look like
+$ yarn workspace @cent-social-index/client add lodash
+```
+
+
 [//]: # (### How can I load preload the transfer data?)
 
 [//]: # ()
