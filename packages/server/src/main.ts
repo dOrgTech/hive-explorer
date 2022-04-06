@@ -6,12 +6,15 @@ import { AppService } from 'src/app.service'
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule)
+  // @TODO: this has to be changed for production
   app.enableCors({
     origin: '*',
     methods: 'GET, PUT, POST, DELETE',
     allowedHeaders: 'Content-Type, Authorization'
   })
+
   const appService = app.get(AppService)
+
   if (process.env[Env.RunDump] === 'true') {
     appService.dump()
   }

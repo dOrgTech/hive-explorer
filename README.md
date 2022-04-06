@@ -87,7 +87,6 @@ $ yarn workspace [name-of-package] add [name-of-npm-package]
 $ yarn workspace @cent-social-index/client add lodash
 ```
 
-
 [//]: # (### How can I load preload the transfer data?)
 
 [//]: # ()

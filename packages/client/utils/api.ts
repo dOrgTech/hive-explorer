@@ -19,8 +19,7 @@ export const ping = async () => {
   const res = await axios.request<PingData>({
     method: 'get',
     url: `${baseURL}/ping`,
-    transformResponse: (r: PingData) => r
+    transformResponse: r => JSON.parse(r)
   })
-
   return res.data
 }

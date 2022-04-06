@@ -5,19 +5,17 @@ import styles from '@/styles/home.module.scss'
 import { baseURL, ping, PingData } from 'utils/api'
 
 const Ping: NextPage = () => {
-  const [loading, setLoading] = useState(false)
-  const [data, setData] = useState<PingData>()
+  const [pingData, setPingData] = useState<PingData>({ message: 'loading' })
 
   useEffect(() => {
-    setLoading(true)
     ping()
       .then(data => {
-        setData(data)
-        setLoading(false)
+        console.log(data)
+        setPingData(data)
       })
       .catch(error => {
-        console.log('error => ', error)
-        setLoading(false)
+        console.error('error => ', error)
+        setPingData({ message: 'server is down' })
       })
   }, [])
 
@@ -26,7 +24,7 @@ const Ping: NextPage = () => {
       <h1>Is server up ?</h1>
       <h3>Ping result from url: {baseURL}</h3>
       <pre>
-        <code>{data}</code>
+        <code>{pingData.message}</code>
       </pre>
     </div>
   )
