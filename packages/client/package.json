@@ -1,0 +1,39 @@
+{
+  "name": "@cent-social-index/client",
+  "version": "0.0.1",
+  "private": true,
+  "license": "UNLICENSED",
+  "scripts": {
+    "dev": "next dev --port 5003",
+    "build": "next build",
+    "start": "next start --port 5003",
+    "lint": "next lint",
+    "test": "jest"
+  },
+  "dependencies": {
+    "classnames": "2.3.1",
+    "lodash": "4.17.21",
+    "next": "12.0.9",
+    "react": "17.0.2",
+    "react-dom": "17.0.2",
+    "sass": "1.49.0"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "5.16.1",
+    "@testing-library/react": "12.1.2",
+    "@testing-library/user-event": "13.5.0",
+    "@types/lodash": "4.14.178",
+    "@types/node": "17.0.23",
+    "@types/react": "17.0.43",
+    "babel-jest": "27.4.6",
+    "eslint": "8.8.0",
+    "eslint-config-next": "12.0.9",
+    "eslint-config-prettier": "8.3.0",
+    "eslint-plugin-import": "^2.25.4",
+    "eslint-plugin-prettier": "4.0.0",
+    "eslint-plugin-testing-library": "5.0.5",
+    "jest": "27.4.7",
+    "prettier": "2.6.2",
+    "typescript": "4.6.3"
+  }
+}

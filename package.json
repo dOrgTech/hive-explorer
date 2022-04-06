@@ -7,7 +7,6 @@
   "license": "UNLICENSED",
   "private": true,
   "scripts": {
-    "setup": "lerna exec yarn",
     "server:build": "lerna exec yarn build",
     "server:start": "lerna exec yarn start",
     "server:start:dev": "lerna exec --scope @cent-social-index/server --scope @cent-social-index/server yarn 'start:dev'",
@@ -22,12 +21,19 @@
     "server:test:debug": "lerna exec --scope @cent-social-index/server yarn 'test:debug'",
     "server:test:e2e": "lerna exec --scope @cent-social-index/server yarn 'test:e2'",
     "server:db:dev:start": "lerna exec --scope @cent-social-index/server yarn 'db:dev:start'",
-    "server:db:dev:stop": "lerna exec --scope @cent-social-index/server yarn 'db:dev:stop'"
+    "server:db:dev:stop": "lerna exec --scope @cent-social-index/server yarn 'db:dev:stop'",
+    "client:start": "lerna exec --scope @cent-social-index/client yarn start",
+    "client:start:dev": "lerna exec --scope @cent-social-index/client yarn dev",
+    "client:build": "lerna exec --scope @cent-social-index/client yarn build",
+    "client:lint": "lerna exec --scope @cent-social-index/client yarn lint",
+    "client:test": "lerna exec --scope @cent-social-index/client yarn test"
   },
   "devDependencies": {
     "lerna": "^4.0.0"
   },
-  "workspaces": ["packages/*"],
+  "workspaces": [
+    "packages/*"
+  ],
   "volta": {
     "node": "16.14.0"
   }
