@@ -1,10 +1,15 @@
-# Compiled output
-packages/server/dist
+# compiled output
+/dist
 
 # dependencies
-node_modules
+/node_modules
 
-# Logs
+# env
+.env
+.env.development
+.env.production
+
+# logs
 logs
 *.log
 npm-debug.log*
@@ -16,7 +21,11 @@ lerna-debug.log*
 # OS
 .DS_Store
 
-# IDEs and editors
+# tests
+coverage
+.nyc_output
+
+# ide
 /.idea
 .project
 .classpath
@@ -24,8 +33,6 @@ lerna-debug.log*
 *.launch
 .settings/
 *.sublime-workspace
-
-# IDE - VSCode
 .vscode/
 .vscode/*
 !.vscode/settings.json
@@ -33,5 +40,5 @@ lerna-debug.log*
 !.vscode/launch.json
 !.vscode/extensions.json
 
-# MISC
+# misc
 package-lock.json
