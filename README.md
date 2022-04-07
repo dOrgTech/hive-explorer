@@ -11,6 +11,13 @@ The current tools we are using for are:
 * `Docker` for setting up a local postgres database
 
 ## Dev Environment
+Examples of .env file are can be found in both client and server apps
+
+* root/packages/client/.env.example
+* root/packages/server/.env.example
+
+To get the development environment running you will need to create in each directory a `.env.development` file and copy the contents from the examples.
+For security reason there are certain variables not included in the example files please contact the dev team @ d0rg.
 
 ### Dependencies
 * Node 16.14.0
