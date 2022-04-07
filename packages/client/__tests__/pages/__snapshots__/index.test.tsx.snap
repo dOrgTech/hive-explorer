@@ -3,7 +3,7 @@
 exports[`Home matches the snapshot 1`] = `
 <div>
   <div
-    class="container"
+    class="container container-light"
   >
     <main
       class="main"
@@ -13,21 +13,45 @@ exports[`Home matches the snapshot 1`] = `
       >
         Welcome to 
         <a
-          href="https://nextjs.org"
+          href="https://cent.app.bio"
         >
-          Next.js!
+          Cent Social Index
         </a>
       </h1>
       <p
         class="description"
       >
-        Get started by editing
-         
+        Check routing and and server api
+      </p>
+      <button
+        class="theme-btn theme-btn-dark"
+      >
+        Ping Page
+      </button>
+      <p
+        class="description"
+      >
+        SCSS at work
+      </p>
+      <button
+        class="theme-btn theme-btn-dark"
+      >
+        Dark Theme
+      </button>
+      <p
+        class="description"
+      >
+        Get started by editing 
         <code
           class="code"
         >
-          pages/index.js
+          pages/index.tsx
         </code>
+      </p>
+      <p
+        class="description"
+      >
+        Next.js Docs
       </p>
       <div
         class="grid"

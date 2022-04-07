@@ -1,4 +1,5 @@
 import type { NextPage } from 'next'
+import Link from 'next/link'
 import classnames from 'classnames'
 import { useEffect, useState } from 'react'
 import styles from '@/styles/home.module.scss'
@@ -14,7 +15,7 @@ const Ping: NextPage = () => {
         setPingData(data)
       })
       .catch(error => {
-        console.error('error => ', error)
+        console.error(error)
         setPingData({ message: 'server is down' })
       })
   }, [])
@@ -26,6 +27,7 @@ const Ping: NextPage = () => {
       <pre>
         <code>{pingData.message}</code>
       </pre>
+      <Link href="/">/index</Link>
     </div>
   )
 }
