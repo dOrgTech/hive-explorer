@@ -7,6 +7,7 @@ import { AnyblockModule } from 'src/anyblock/anyblock.module'
 import { DumpedBlocksModule } from 'src/dumped-blocks/dumped-blocks.module'
 import { EventsModule } from 'src/events/events.module'
 import { AppDatabaseModule } from 'src/app-database/app-database.module'
+import { CollectionOwnerModule } from './collection-owner/collection-owner.module'
 
 @Module({
   imports: [
@@ -17,7 +18,8 @@ import { AppDatabaseModule } from 'src/app-database/app-database.module'
     AnyblockModule,
     AppDatabaseModule,
     EventsModule,
-    DumpedBlocksModule
+    DumpedBlocksModule,
+    CollectionOwnerModule
   ],
   controllers: [AppController],
   providers: [AppService, Logger]

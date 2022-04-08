@@ -14,6 +14,7 @@ async function bootstrap() {
   })
 
   const appService = app.get(AppService)
+  appService.jaccard()
 
   if (process.env[Env.RunDump] === 'true') {
     appService.dump()

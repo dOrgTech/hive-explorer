@@ -3,6 +3,7 @@ packages/server/dist
 
 # dependencies
 node_modules
+db/
 
 # Logs
 logs

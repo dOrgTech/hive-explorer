@@ -5,6 +5,8 @@ import { EventsService } from 'src/events/events.service'
 import { DumpedBlocksService } from 'src/dumped-blocks/dumped-blocks.service'
 import { ConfigService } from '@nestjs/config'
 import { Env } from 'src/_constants/env'
+import { CollectionOwnerService } from './collection-owner/collection-owner.service'
+var Jaccard = require("jaccard-index");
 
 @Injectable()
 export class AppService {
@@ -13,12 +15,46 @@ export class AppService {
     private readonly configService: ConfigService,
     private readonly anyblockService: AnyblockService,
     private readonly eventsService: EventsService,
-    private readonly dumpedBlocksService: DumpedBlocksService
+    private readonly dumpedBlocksService: DumpedBlocksService,
+    private readonly collectionOwnerService: CollectionOwnerService
   ) {}
 
   ping() {
     // @TODO: find a proper way to respond with JSON data
     return JSON.stringify({ message: 'Cent social index server is running' })
+  }
+
+  async jaccard() {
+    const address = '0x60DD04260484B6A3771F99807F62d9897371fa0c'
+    const collections = await this.collectionOwnerService.findByOwner(address)
+    if (collections.length > 0) {
+      const userSet = collections.map(c => c.contract_hash);
+      const othersCollections = await this.collectionOwnerService.findSharedCollections(address, userSet)
+      const othersCollectionsMap = {}
+      othersCollections.forEach(c => {
+        if (!othersCollectionsMap[c.owner]) {
+          othersCollectionsMap[c.owner] = [];
+        }
+        othersCollectionsMap[c.owner].push(c.contract_hash);
+      });
+      const scores = [];
+      var jaccard = Jaccard();
+      Object.keys(othersCollectionsMap).forEach(address => {
+        scores.push({
+          a: address,
+          s: jaccard.index(userSet, othersCollectionsMap[address]).toFixed(3)
+        });
+      });
+      const ranked = scores.sort((a, b) => a.s < b.s ? 1 : -1);
+      console.log("hello: ", ranked.slice(0, 10));
+      return {
+        collections: userSet,
+        jaccardRank: ranked.slice(0, 10)
+      }
+    } else {
+      console.log("no collections")
+      return JSON.stringify({ message: 'No matches on ' + address })
+    }
   }
 
   async dump() {

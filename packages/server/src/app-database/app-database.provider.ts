@@ -4,6 +4,7 @@ import { Provider } from 'src/_constants/providers'
 import { Env } from 'src/_constants/env'
 import { DumpedBlock } from 'src/dumped-blocks/dumped-block.entity'
 import { Event } from 'src/events/event.entity'
+import { CollectionOwner } from 'src/collection-owner/collection-owner.entity'
 
 export const appDatabaseProvider = [
   {
@@ -18,7 +19,7 @@ export const appDatabaseProvider = [
       const url = `postgresql://${username}:${password}@${host}:${port}/${database}`
 
       const sequelize = new Sequelize(url, { dialect: 'postgres' })
-      sequelize.addModels([DumpedBlock, Event])
+      sequelize.addModels([DumpedBlock, Event, CollectionOwner])
       // @TODO: maybe we don't need to sync in production (find a way to do migrations)
       await sequelize.sync()
       return sequelize
