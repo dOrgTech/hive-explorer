@@ -29,6 +29,7 @@ export class AppService {
     if (collections.length > 0) {
       const userSet = collections.map(c => c.contract_hash)
       const othersCollections = await this.collectionOwnerService.findSharedCollections(address, userSet)
+
       const othersCollectionsMap = {}
       othersCollections.forEach(c => {
         if (!othersCollectionsMap[c.owner]) {
@@ -36,25 +37,23 @@ export class AppService {
         }
         othersCollectionsMap[c.owner].push(c.contract_hash)
       })
-      const scores = []
-      const jaccard = Jaccard()
-      Object.keys(othersCollectionsMap).forEach(address => {
-        scores.push({
+
+      const ranked = Object.keys(othersCollectionsMap)
+        .map(address => ({
           a: address,
-          s: jaccard.index(userSet, othersCollectionsMap[address]).toFixed(3)
-        })
-      })
-      const ranked = scores.sort((a, b) => (a.s < b.s ? 1 : -1))
-      console.log('hello: ', ranked.slice(0, 10))
+          s: Jaccard().index(userSet, othersCollectionsMap[address]).toFixed(3)
+        }))
+        .sort((a, b) => (a.s < b.s ? 1 : -1))
+
       // @TODO: find a proper way to respond with JSON data
       return {
+        message: 'success',
         collections: userSet,
-        jaccardRank: ranked.slice(0, 10)
+        rank: ranked.slice(0, 10)
       }
     } else {
-      console.log('no collections')
       // @TODO: find a proper way to respond with JSON data
-      return JSON.stringify({ message: 'No matches on ' + address })
+      return JSON.stringify({ message: `No matches on: ${address}`, collections: [], rank: [] })
     }
   }
 
