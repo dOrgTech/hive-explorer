@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common'
 import { Provider } from 'src/_constants/providers'
 import { ChainEventRecord } from 'src/anyblock/types'
 import { CollectionOwner } from './collection-owner.entity'
-import { Op } from "sequelize";
+import { Op } from 'sequelize'
 
 @Injectable()
 export class CollectionOwnerService {
@@ -14,7 +14,7 @@ export class CollectionOwnerService {
       where: {
         owner: ownerAddress
       }
-    });
+    })
   }
 
   findSharedCollections(ownerAddress: string, ownerCollections: string[]) {
@@ -23,13 +23,13 @@ export class CollectionOwnerService {
       where: {
         owner: {
           [Op.notIn]: ['0x0000000000000000000000000000000000000000', ownerAddress]
-        }, 
+        },
         contract_hash: {
           [Op.in]: ownerCollections
         }
       },
       limit: 10
-    });
+    })
   }
 
   findAll() {

@@ -1,1 +1,1 @@
-declare module "jaccard-index"
+declare module 'jaccard-index'
