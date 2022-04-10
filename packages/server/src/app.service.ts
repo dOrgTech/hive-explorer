@@ -1,11 +1,9 @@
-import * as Jaccard from 'jaccard-index'
 import { Injectable, Logger } from '@nestjs/common'
 import { AnyblockService } from 'src/anyblock/anyblock.service'
 import { EventsService } from 'src/events/events.service'
 import { DumpedBlocksService } from 'src/dumped-blocks/dumped-blocks.service'
 import { ConfigService } from '@nestjs/config'
 import { Env } from 'src/_constants/env'
-import { CollectionOwnerService } from './collection-owner/collection-owner.service'
 
 @Injectable()
 export class AppService {
@@ -14,40 +12,8 @@ export class AppService {
     private readonly configService: ConfigService,
     private readonly anyblockService: AnyblockService,
     private readonly eventsService: EventsService,
-    private readonly dumpedBlocksService: DumpedBlocksService,
-    private readonly collectionOwnerService: CollectionOwnerService
+    private readonly dumpedBlocksService: DumpedBlocksService
   ) {}
-
-  async jaccard() {
-    const address = '0x60DD04260484B6A3771F99807F62d9897371fa0c'
-    const collections = await this.collectionOwnerService.findByOwner(address)
-    if (collections.length > 0) {
-      const userSet = collections.map(c => c.contract_hash)
-      const othersCollections = await this.collectionOwnerService.findSharedCollections(address, userSet)
-
-      const othersCollectionsMap = {}
-      othersCollections.forEach(c => {
-        if (!othersCollectionsMap[c.owner]) {
-          othersCollectionsMap[c.owner] = []
-        }
-        othersCollectionsMap[c.owner].push(c.contract_hash)
-      })
-
-      const ranked = Object.keys(othersCollectionsMap)
-        .map(address => ({
-          a: address,
-          s: Jaccard().index(userSet, othersCollectionsMap[address]).toFixed(3)
-        }))
-        .sort((a, b) => (a.s < b.s ? 1 : -1))
-
-      return {
-        collections: userSet,
-        rank: ranked.slice(0, 10)
-      }
-    } else {
-      return { collections: [], rank: [] }
-    }
-  }
 
   async dump() {
     try {
