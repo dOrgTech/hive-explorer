@@ -96,59 +96,37 @@ $ yarn workspace @cent-social-index/client add lodash
 
 ### How can I load preload the transfer data?
 
-
 First, you'll need to download the `events.csv` from [dropbox](https://www.dropbox.com/s/k86snoabcto42mf/events.csv?dl=0) which is a 22gb file that has all NFT transfers from the first ever block that ERC-721 tokens existed (around block 4.6m).
-
 
 Once you've got the data file and installed Docker and have the PostgreSQL image running as described above, you'll want to load the data onto the image and persist it to the volume.
 
-
 *Note that due to the size of the data file, some of these steps might take a while — thus, while developing it might make sense to use a smaller subset of the data.*
-
 
 1. Connect to the Docker image in with your preferred DB client
 
-
 2. Run the following query to create the table / schema:
 
-
 ```sql
-
 CREATE TABLE events (
-
     id              INT PRIMARY KEY,
-
     block_number    VARCHAR(10),
-
     nft_name        TEXT,
-
     contract_hash   VARCHAR(66),
-
     txn_hash        VARCHAR(66),
-
     txn_type        VARCHAR(10),
-
     gas             VARCHAR(32),
-
     value           VARCHAR(78),
-
     from_hash       VARCHAR(42),
-
     to_hash         VARCHAR(42),
-
     token_id        VARCHAR(78),
-
     timestamp       DATE,
-
     createdAt       DATE,
-
     updatedAt       DATE
-
 );
 
 ```
 
-```
+```sql
 CREATE TABLE collection_owner (
     id              SERIAL PRIMARY KEY,
     contract_hash   VARCHAR(66),
@@ -156,63 +134,43 @@ CREATE TABLE collection_owner (
 );
 ```
 
-
 3. Then, you'll need to get move the `.csv` file form your host machine to the container.
-
-
     * You can get the container_id of the container by running `docker ps` on the command line
 
-
 ```bash
-
 $ docker cp /path/events.csv container_id:/events.csv
 
 ```
 
-
 4. Now, populate the Postgres DB by running the following query which copies the `.csv` data into the DB volume
 
-
 ```sql
-
 COPY events(id, block_number, contract_hash, nft_name, txn_hash, txn_type, gas, value, from_hash, to_hash, token_id, timestamp, createdat, updatedat)
-
 FROM '/events.csv'
-
 DELIMITER ','
-
 CSV HEADER;
-
 ```
-
 
 5. Now you can create some indices to speed up querying, e.g.
 
 ```sql
-
 CREATE INDEX sender ON events (from_hash);
-
 CREATE INDEX recipient ON events (to_hash);
-
 CREATE INDEX contract ON events (contract_hash);
-
 CREATE INDEX members ON events (contract_hash, to_hash);
-
 CREATE INDEX c_o_owner ON collection_owner (owner);
-
 CREATE INDEX c_o_name ON collection_owner (contract_hash);
-
 ```
 
 6. Create records on collection_owner table from events table
-```
+
+```sql
 INSERT INTO collection_owner (contract_hash, owner)
 SELECT DISTINCT contract_hash, to_hash
 FROM events;
 ```
 
 Now your database should persist all of the historical data in the volume! If you want to reset this, follow the below instructions.
-
 
 ### How do start the local database from scratch?
 
