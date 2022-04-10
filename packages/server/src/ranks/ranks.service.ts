@@ -22,10 +22,10 @@ export class RanksService {
 
       const ranked = Object.keys(othersCollectionsMap)
         .map(address => ({
-          a: address,
-          s: Jaccard().index(userSet, othersCollectionsMap[address]).toFixed(3)
+          address: address,
+          score: Jaccard().index(userSet, othersCollectionsMap[address]).toFixed(3) as string
         }))
-        .sort((a, b) => (a.s < b.s ? 1 : -1))
+        .sort((a, b) => (a.score < b.score ? 1 : -1))
 
       return {
         collections: userSet,

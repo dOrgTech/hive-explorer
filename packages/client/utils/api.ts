@@ -24,7 +24,7 @@ export const ping = async () => {
   return res.data
 }
 
-export type RankData = { collections: string[]; rank: { a: string; s: any }[] }
+export type RankData = { collections: string[]; rank: { address: string; score: string }[] }
 
 export const getRankByAddress = async (address: string) => {
   const res = await axios.request<RankData>({
