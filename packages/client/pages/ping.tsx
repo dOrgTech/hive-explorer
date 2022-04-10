@@ -22,12 +22,14 @@ const Ping: NextPage = () => {
 
   return (
     <div className={classnames(styles.container)}>
+      <button>
+        <Link href="/">/index</Link>
+      </button>
       <h1>Is server up ?</h1>
       <h3>Ping result from url: {baseURL}</h3>
       <pre>
         <code>{pingData.message}</code>
       </pre>
-      <Link href="/">/index</Link>
     </div>
   )
 }
