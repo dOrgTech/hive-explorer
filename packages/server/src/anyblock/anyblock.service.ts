@@ -45,7 +45,7 @@ export class AnyblockService {
         event.probability = 1 AND
         event.block_number >= :from AND
         event.block_number <= :to
-    `;
+    `
     return this.db.query<ChainCollectionOwnerRecord>(query, {
       type: QueryTypes.SELECT,
       raw: true,

@@ -14,7 +14,7 @@ export class AppService {
     private readonly anyblockService: AnyblockService,
     private readonly eventsService: EventsService,
     private readonly dumpedBlocksService: DumpedBlocksService,
-    private readonly collectionOwnerService: CollectionOwnerService,
+    private readonly collectionOwnerService: CollectionOwnerService
   ) {}
 
   async dump() {

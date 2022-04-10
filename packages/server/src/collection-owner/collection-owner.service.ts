@@ -1,7 +1,7 @@
 import { Op } from 'sequelize'
 import { Inject, Injectable } from '@nestjs/common'
 import { Provider } from 'src/_constants/providers'
-import { ChainCollectionOwnerRecord, ChainEventRecord } from 'src/anyblock/types'
+import { ChainCollectionOwnerRecord } from 'src/anyblock/types'
 import { CollectionOwner } from 'src/collection-owner/collection-owner.entity'
 
 @Injectable()
