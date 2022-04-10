@@ -18,11 +18,6 @@ export class AppService {
     private readonly collectionOwnerService: CollectionOwnerService
   ) {}
 
-  ping() {
-    // @TODO: find a proper way to respond with JSON data
-    return JSON.stringify({ message: 'Cent social index server is running' })
-  }
-
   async jaccard() {
     const address = '0x60DD04260484B6A3771F99807F62d9897371fa0c'
     const collections = await this.collectionOwnerService.findByOwner(address)
@@ -45,15 +40,12 @@ export class AppService {
         }))
         .sort((a, b) => (a.s < b.s ? 1 : -1))
 
-      // @TODO: find a proper way to respond with JSON data
       return {
-        message: 'success',
         collections: userSet,
         rank: ranked.slice(0, 10)
       }
     } else {
-      // @TODO: find a proper way to respond with JSON data
-      return JSON.stringify({ message: `No matches on: ${address}`, collections: [], rank: [] })
+      return { collections: [], rank: [] }
     }
   }
 
