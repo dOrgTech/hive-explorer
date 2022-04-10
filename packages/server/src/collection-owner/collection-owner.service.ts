@@ -1,7 +1,7 @@
 import { Op } from 'sequelize'
 import { Inject, Injectable } from '@nestjs/common'
 import { Provider } from 'src/_constants/providers'
-import { ChainEventRecord } from 'src/anyblock/types'
+import { ChainCollectionOwnerRecord, ChainEventRecord } from 'src/anyblock/types'
 import { CollectionOwner } from 'src/collection-owner/collection-owner.entity'
 
 @Injectable()
@@ -36,11 +36,11 @@ export class CollectionOwnerService {
     return this.collectionOwnerRepository.findAll()
   }
 
-  create(record: ChainEventRecord) {
+  create(record: ChainCollectionOwnerRecord) {
     return this.collectionOwnerRepository.create(record)
   }
 
-  bulkCreate(records: ChainEventRecord[]) {
+  bulkCreate(records: ChainCollectionOwnerRecord[]) {
     return this.collectionOwnerRepository.bulkCreate(records)
   }
 }

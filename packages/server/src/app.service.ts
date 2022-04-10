@@ -4,6 +4,7 @@ import { EventsService } from 'src/events/events.service'
 import { DumpedBlocksService } from 'src/dumped-blocks/dumped-blocks.service'
 import { ConfigService } from '@nestjs/config'
 import { Env } from 'src/_constants/env'
+import { CollectionOwnerService } from './collection-owner/collection-owner.service'
 
 @Injectable()
 export class AppService {
@@ -12,7 +13,8 @@ export class AppService {
     private readonly configService: ConfigService,
     private readonly anyblockService: AnyblockService,
     private readonly eventsService: EventsService,
-    private readonly dumpedBlocksService: DumpedBlocksService
+    private readonly dumpedBlocksService: DumpedBlocksService,
+    private readonly collectionOwnerService: CollectionOwnerService,
   ) {}
 
   async dump() {
@@ -78,9 +80,10 @@ export class AppService {
           : lastChainBlockNumber
 
       const chainBlockToDump = await this.anyblockService.findBlockByNumber(blockRange.to)
-      const chainEvents = await this.anyblockService.findEventsByBlockRange({ ...blockRange })
+      // const chainEvents = await this.anyblockService.findEventsByBlockRange({ ...blockRange })
+      const chainCollectionOwners = await this.anyblockService.findCollectionOwnersByBlockRange({ ...blockRange })
 
-      await this.eventsService.bulkCreate(chainEvents)
+      await this.collectionOwnerService.bulkCreate(chainCollectionOwners)
       await this.dumpedBlocksService.create({ number: chainBlockToDump.number })
 
       this.dump()

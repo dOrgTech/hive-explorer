@@ -38,3 +38,8 @@ export type ChainEventRecord = {
   block_number: string
   timestamp: Date
 }
+
+export type ChainCollectionOwnerRecord = {
+  contract_hash: string
+  owner: string
+}
