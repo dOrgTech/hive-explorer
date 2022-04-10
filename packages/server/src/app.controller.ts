@@ -6,7 +6,7 @@ export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get('/ping')
-  ping(): string {
-    return this.appService.ping()
+  ping() {
+    return { message: 'Cent social index server is running' }
   }
 }
