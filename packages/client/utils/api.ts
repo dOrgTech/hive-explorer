@@ -13,6 +13,8 @@ const getBaseURL = (): string => {
 
 export const baseURL = getBaseURL()
 
+export const isAxiosError = axios.isAxiosError
+
 export type PingData = { message: string }
 
 export const ping = async () => {

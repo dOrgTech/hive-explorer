@@ -44,7 +44,7 @@ export class AppService {
       const lastDumpedBlockNumber = hasLastDumpedBlock ? parseInt(lastDumpedBlock.number, 10) : 0
 
       // don't run again if there is a ceiling and if we have reached the last block
-      const hasReachedCeiling = hasRangeCeiling && hasLastDumpedBlock && lastDumpedBlockNumber === blockRangeCeiling
+      const hasReachedCeiling = hasRangeCeiling && hasLastDumpedBlock && lastDumpedBlockNumber >= blockRangeCeiling
       if (hasReachedCeiling) {
         this.logger.warn(`Reached ${Env.QueryBlockRangeCeiling}. Process complete.`)
         return

@@ -3,7 +3,7 @@ import Link from 'next/link'
 import classnames from 'classnames'
 import React, { useState } from 'react'
 import styles from '@/styles/home.module.scss'
-import { getRankByAddress, RankData } from 'utils/api'
+import { getRankByAddress, isAxiosError, RankData } from 'utils/api'
 
 type InitialState = {
   loading: boolean
@@ -37,14 +37,27 @@ const Rank: NextPage = () => {
   const handleGetRank = async (event: React.SyntheticEvent) => {
     event.preventDefault()
     resetStateForRequest()
+
     try {
+      if (!address) {
+        throw new Error('Address field is empty')
+      }
+
       setLoading(true)
       const data = await getRankByAddress(address)
       setRakData(data)
-    } catch (error: any) {
+    } catch (error) {
+      if (isAxiosError(error)) {
+        setError(error.response?.data?.message ?? error.message)
+        return
+      }
+
       if (error instanceof Error) {
         setError(error.message)
+        return
       }
+
+      setError('Unknown Error')
     } finally {
       setLoading(false)
     }
