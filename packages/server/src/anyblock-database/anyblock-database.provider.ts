@@ -17,7 +17,9 @@ export const anyblockDatabaseProvider = [
 
       return new Sequelize(url, {
         dialect: 'postgres',
-        dialectOptions: {
+        logging: false,
+	define: { timestamps: false },
+	dialectOptions: {
           ssl: {
             require: true,
             rejectUnauthorized: false
