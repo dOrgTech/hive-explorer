@@ -178,6 +178,15 @@ INSERT INTO collection_owner (contract_hash, owner)
 SELECT DISTINCT contract_hash, to_hash
 FROM events;
 ```
+6. Create last dumped block record on dumped_blocks table from events table
+```sql
+INSERT INTO dumped_blocks ("number", "updatedAt", "createdAt")
+VALUES (
+    (SELECT MAX(block_number::DECIMAL) as block_number FROM events),
+    NOW(),
+    NOW()
+);
+```
 
 Now your database should persist the historical data in the volume! If you want to reset this, follow the below instructions.
 
