@@ -5,7 +5,7 @@ const getBaseURL = (): string => {
     case 'development':
       return 'http://localhost:5001'
     case 'production':
-      return ''
+      return 'https://j.cent.co'
     default:
       return ''
   }
