@@ -81,7 +81,7 @@ export class AppService {
 
       const chainBlockToDump = await this.anyblockService.findBlockByNumber(blockRange.to)
       const chainCollectionOwners = await this.anyblockService.findCollectionOwnersByBlockRange({ ...blockRange })
-      // The following two lines also dump the events to events table
+      // Uncomment the following two lines also dump the events to events table
       // const chainEvents = await this.anyblockService.findEventsByBlockRange({ ...blockRange })
       // await this.eventsService.bulkCreate(chainEvents)
 

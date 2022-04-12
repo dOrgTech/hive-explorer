@@ -94,7 +94,7 @@ $ yarn workspace [name-of-package] add [name-of-npm-package]
 $ yarn workspace @cent-social-index/client add lodash
 ```
 
-### How can I load preload the transfer data?
+### How can I manually populate the database instead of running dumps?
 
 First, you'll need to download the `events.csv` from [dropbox](https://www.dropbox.com/s/k86snoabcto42mf/events.csv?dl=0) which is a 22gb file that has all NFT transfers from the first ever block that ERC-721 tokens existed (around block 4.6m).
 
@@ -104,8 +104,17 @@ Once you've got the data file and installed Docker and have the PostgreSQL image
 
 1. Connect to the Docker image in with your preferred DB client
 
-2. Run the following query to create the table / schema:
+2. Run the server at least once (no dump mode) to get the db and table definitions created
 
+```sql
+CREATE TABLE dumped_blocks (
+    id              SERIAL PRIMARY KEY,
+    number          VARCHAR(10),
+    timestamp       DATE,
+    createdAt       DATE,
+    updatedAt       DATE
+);
+```
 ```sql
 CREATE TABLE events (
     id              INT PRIMARY KEY,
@@ -125,13 +134,24 @@ CREATE TABLE events (
 );
 
 ```
-
 ```sql
 CREATE TABLE collection_owner (
     id              SERIAL PRIMARY KEY,
     contract_hash   VARCHAR(66),
     owner           VARCHAR(42)
 );
+```
+
+
+Note: You can apply these indexes to speedy up the steps below
+
+```sql
+CREATE INDEX sender ON events (from_hash);
+CREATE INDEX recipient ON events (to_hash);
+CREATE INDEX contract ON events (contract_hash);
+CREATE INDEX members ON events (contract_hash, to_hash);
+CREATE INDEX c_o_owner ON collection_owner (owner);
+CREATE INDEX c_o_name ON collection_owner (contract_hash);
 ```
 
 3. Then, you'll need to get move the `.csv` file form your host machine to the container.
@@ -151,18 +171,7 @@ DELIMITER ','
 CSV HEADER;
 ```
 
-5. Now you can create some indices to speed up querying, e.g.
-
-```sql
-CREATE INDEX sender ON events (from_hash);
-CREATE INDEX recipient ON events (to_hash);
-CREATE INDEX contract ON events (contract_hash);
-CREATE INDEX members ON events (contract_hash, to_hash);
-CREATE INDEX c_o_owner ON collection_owner (owner);
-CREATE INDEX c_o_name ON collection_owner (contract_hash);
-```
-
-6. Create records on collection_owner table from events table
+5. Create records on collection_owner table from events table
 
 ```sql
 INSERT INTO collection_owner (contract_hash, owner)
@@ -170,7 +179,7 @@ SELECT DISTINCT contract_hash, to_hash
 FROM events;
 ```
 
-Now your database should persist all of the historical data in the volume! If you want to reset this, follow the below instructions.
+Now your database should persist the historical data in the volume! If you want to reset this, follow the below instructions.
 
 ### How do start the local database from scratch?
 
