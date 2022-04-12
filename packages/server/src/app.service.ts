@@ -1,4 +1,5 @@
 import * as Jaccard from 'jaccard-index'
+import { ethers } from 'ethers';
 import { Injectable, Logger } from '@nestjs/common'
 import { AnyblockService } from 'src/anyblock/anyblock.service'
 import { EventsService } from 'src/events/events.service'
@@ -18,12 +19,12 @@ export class AppService {
     private readonly collectionOwnerService: CollectionOwnerService
   ) {}
 
-  async jaccard() {
-    const address = '0x60DD04260484B6A3771F99807F62d9897371fa0c'
-    const collections = await this.collectionOwnerService.findByOwner(address)
+  async jaccard(address) {
+    const normalizedAddress = ethers.utils.getAddress(address.toLowerCase())
+    const collections = await this.collectionOwnerService.findByOwner(normalizedAddress)
     if (collections.length > 0) {
       const userSet = collections.map(c => c.contract_hash)
-      const othersCollections = await this.collectionOwnerService.findSharedCollections(address, userSet)
+      const othersCollections = await this.collectionOwnerService.findSharedCollections(normalizedAddress, userSet)
 
       const othersCollectionsMap = {}
       othersCollections.forEach(c => {
