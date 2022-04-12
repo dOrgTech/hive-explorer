@@ -36,7 +36,7 @@ export class AnyblockService {
     
     SELECT
         erc721_addresses.address as contract_hash,
-        event.args::json#>>'{1, hex}' as to_hash
+        event.args::json#>>'{1, hex}' as owner
     FROM event
         INNER JOIN erc721_addresses
         ON event.address = erc721_addresses.address

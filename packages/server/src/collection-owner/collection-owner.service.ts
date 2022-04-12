@@ -41,6 +41,17 @@ export class CollectionOwnerService {
   }
 
   bulkCreate(records: ChainCollectionOwnerRecord[]) {
-    return this.collectionOwnerRepository.bulkCreate(records)
+    // dedupe here since we cannot do it in postgres for bulk creates:
+    // https://pganalyze.com/docs/log-insights/app-errors/U126
+    records = records.filter((value, index, self) =>
+      index === self.findIndex((t) => 
+        t.contract_hash === value.contract_hash && 
+        t.owner === value.owner)
+      )
+    return this.collectionOwnerRepository.bulkCreate(records, 
+      {
+        updateOnDuplicate: ['contract_hash', 'owner']
+      }
+    )
   }
 }
