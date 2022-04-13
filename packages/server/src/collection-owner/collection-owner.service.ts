@@ -27,8 +27,7 @@ export class CollectionOwnerService {
         contract_hash: {
           [Op.in]: ownerCollections
         }
-      },
-      limit: 10
+      }
     })
   }
 
