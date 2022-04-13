@@ -20,5 +20,6 @@
   },
   "include": [
     "src", "decs.d.ts",
+    "test", "app.e2e-spec.ts"
   ]
 }

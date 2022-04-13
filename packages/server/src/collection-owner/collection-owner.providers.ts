@@ -1,5 +1,5 @@
 import { Provider } from 'src/_constants/providers'
-import { CollectionOwner } from './collection-owner.entity'
+import { CollectionOwner } from 'src/collection-owner/collection-owner.entity'
 
 export const collectionOwnerProviders = [
   {

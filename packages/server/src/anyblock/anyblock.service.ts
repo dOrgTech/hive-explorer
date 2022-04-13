@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common'
 import { Sequelize } from 'sequelize-typescript'
 import { Provider } from 'src/_constants/providers'
 import { QueryTypes } from 'sequelize'
-import { ChainBlockRecord, ChainEventRecord } from 'src/anyblock/types'
+import { ChainBlockRecord, ChainCollectionOwnerRecord, ChainEventRecord } from 'src/anyblock/types'
 
 @Injectable()
 export class AnyblockService {
@@ -22,6 +22,35 @@ export class AnyblockService {
     const query = `SELECT * FROM block ORDER BY number DESC LIMIT 1`
     const records = await this.db.query<ChainBlockRecord>(query, { type: QueryTypes.SELECT, raw: true })
     return records[0] || null
+  }
+
+  findCollectionOwnersByBlockRange(blockRange: { from: number; to: number }): Promise<ChainCollectionOwnerRecord[]> {
+    const query = `
+    WITH erc721_addresses(address, name) AS (
+      SELECT address, name
+      FROM token
+      WHERE
+        (type = 'ERC721' OR type = 'ERC1155') AND
+        total_supply > 0
+    )
+    
+    SELECT
+        erc721_addresses.address as contract_hash,
+        event.args::json#>>'{1, hex}' as owner
+    FROM event
+        INNER JOIN erc721_addresses
+        ON event.address = erc721_addresses.address
+    WHERE
+        event.event = 'Transfer' AND
+        event.probability = 1 AND
+        event.block_number >= :from AND
+        event.block_number <= :to
+    `
+    return this.db.query<ChainCollectionOwnerRecord>(query, {
+      type: QueryTypes.SELECT,
+      raw: true,
+      replacements: { from: blockRange.from, to: blockRange.to }
+    })
   }
 
   findEventsByBlockRange(blockRange: { from: number; to: number }): Promise<ChainEventRecord[]> {

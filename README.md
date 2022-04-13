@@ -94,128 +94,114 @@ $ yarn workspace [name-of-package] add [name-of-npm-package]
 $ yarn workspace @cent-social-index/client add lodash
 ```
 
-[//]: # (### How can I load preload the transfer data?)
+### How can I manually populate the database instead of running dumps?
 
-[//]: # ()
-[//]: # (First, you'll need to download the `events.csv` from [dropbox]&#40;https://www.dropbox.com/s/k86snoabcto42mf/events.csv?dl=0&#41; which is a 22gb file that has all NFT transfers from the first ever block that ERC-721 tokens existed &#40;around block 4.6m&#41;.)
+First, you'll need to download the `events.csv` from [dropbox](https://www.dropbox.com/s/k86snoabcto42mf/events.csv?dl=0) which is a 22gb file that has all NFT transfers from the first ever block that ERC-721 tokens existed (around block 4.6m).
 
-[//]: # ()
-[//]: # (Once you've got the data file and installed Docker and have the PostgreSQL image running as described above, you'll want to load the data onto the image and persist it to the volume.)
+Once you've got the data file and installed Docker and have the PostgreSQL image running as described above, you'll want to load the data onto the image and persist it to the volume.
 
-[//]: # ()
-[//]: # (*Note that due to the size of the data file, some of these steps might take a while — thus, while developing it might make sense to use a smaller subset of the data.*)
+*Note that due to the size of the data file, some of these steps might take a while — thus, while developing it might make sense to use a smaller subset of the data.*
 
-[//]: # ()
-[//]: # (1. Connect to the Docker image in with your preferred DB client)
+1. Connect to the Docker image in with your preferred DB client
 
-[//]: # ()
-[//]: # (2. Run the following query to create the table / schema:)
+2. Run the server at least once (no dump mode) to get the db and table definitions created
 
-[//]: # ()
-[//]: # (```sql)
+```sql
+CREATE TABLE dumped_blocks (
+    id              SERIAL PRIMARY KEY,
+    number          VARCHAR(10),
+    timestamp       DATE,
+);
+```
+```sql
+CREATE TABLE events (
+    id              INT PRIMARY KEY,
+    block_number    VARCHAR(10),
+    nft_name        TEXT,
+    contract_hash   VARCHAR(42),
+    txn_hash        VARCHAR(66),
+    txn_type        VARCHAR(10),
+    gas             VARCHAR(32),
+    value           VARCHAR(78),
+    from_hash       VARCHAR(42),
+    to_hash         VARCHAR(42),
+    token_id        VARCHAR(78),
+    timestamp       DATE,
+);
 
-[//]: # (CREATE TABLE events &#40;)
+```
+```sql
+CREATE TABLE collection_owner (
+    id              SERIAL PRIMARY KEY,
+    contract_hash   VARCHAR(42),
+    owner           VARCHAR(42)
+);
+```
 
-[//]: # (    id              INT PRIMARY KEY,)
 
-[//]: # (    block_number    INT,)
+Note: You can apply these indexes to speedy up the steps below
 
-[//]: # (    nft_name        TEXT,)
+```sql
+CREATE INDEX sender ON events (from_hash);
+CREATE INDEX recipient ON events (to_hash);
+CREATE INDEX contract ON events (contract_hash);
+CREATE INDEX members ON events (contract_hash, to_hash);
+CREATE INDEX c_o_owner ON collection_owner (owner);
+CREATE INDEX c_o_name ON collection_owner (contract_hash);
+```
 
-[//]: # (    contract_hash   VARCHAR&#40;66&#41;,)
+3. Then, you'll need to get move the `.csv` file form your host machine to the container.
+    * You can get the container_id of the container by running `docker ps` on the command line
 
-[//]: # (    txn_hash        VARCHAR&#40;66&#41;,)
+```bash
+$ docker cp /path/events.csv container_id:/events.csv
 
-[//]: # (    txn_type        VARCHAR&#40;10&#41;,)
+```
 
-[//]: # (    gas             BIGINT,)
+4. Now, populate the Postgres DB by running the following query which copies the `.csv` data into the DB volume
 
-[//]: # (    value           VARCHAR&#40;78&#41;,)
+```sql
+COPY events(id, block_number, contract_hash, nft_name, txn_hash, txn_type, gas, value, from_hash, to_hash, token_id, timestamp, createdat, updatedat)
+FROM '/events.csv'
+DELIMITER ','
+CSV HEADER;
+```
 
-[//]: # (    from_hash       VARCHAR&#40;42&#41;,)
+5. Create records on collection_owner table from events table
 
-[//]: # (    to_hash         VARCHAR&#40;42&#41;,)
+```sql
+INSERT INTO collection_owner (contract_hash, owner)
+SELECT DISTINCT contract_hash, to_hash
+FROM events;
+```
+6. Create last dumped block record on dumped_blocks table from events table
+```sql
+INSERT INTO dumped_blocks ("number", "updatedAt", "createdAt")
+VALUES (
+    (SELECT MAX(block_number::DECIMAL) as block_number FROM events),
+    NOW(),
+    NOW()
+);
+```
 
-[//]: # (    token_id        VARCHAR&#40;78&#41;,)
+Now your database should persist the historical data in the volume! If you want to reset this, follow the below instructions.
 
-[//]: # (    timestamp       DATE,)
+### How do start the local database from scratch?
 
-[//]: # (    createdAt       DATE,)
 
-[//]: # (    updatedAt       DATE)
+You need to stop the docker container (see above)
 
-[//]: # (&#41;;)
 
-[//]: # (```)
+* UI: From your docker application dashboard -> volumes, remove cent-social-index_pgdata volume
 
-[//]: # ()
-[//]: # (3. Then, you'll need to get move the `.csv` file form your host machine to the container.)
+* Bash:
 
-[//]: # ()
-[//]: # (    * You can get the container_id of the container by running `docker ps` on the command line)
 
-[//]: # ()
-[//]: # (```bash)
+```bash
 
-[//]: # ($ docker cp /path/events.csv container_id:/events.csv)
+$ docker volume rm cent-social-index_pgdata
 
-[//]: # (```)
-
-[//]: # ()
-[//]: # (4. Now, populate the Postgres DB by running the following query which copies the `.csv` data into the DB volume)
-
-[//]: # ()
-[//]: # (```sql)
-
-[//]: # (COPY events&#40;id, block_number, contract_hash, nft_name, txn_hash, txn_type, gas, value, from_hash, to_hash, token_id, timestamp, createdat, updatedat&#41;)
-
-[//]: # (FROM '/events.csv')
-
-[//]: # (DELIMITER ',')
-
-[//]: # (CSV HEADER;)
-
-[//]: # (```)
-
-[//]: # ()
-[//]: # (5. Now you can create some indices to speed up querying, e.g.)
-
-[//]: # ()
-[//]: # (```sql)
-
-[//]: # (CREATE INDEX sender ON events &#40;from_hash&#41;;)
-
-[//]: # (CREATE INDEX recipient ON events &#40;to_hash&#41;;)
-
-[//]: # (CREATE INDEX contract ON events &#40;contract_hash&#41;;)
-
-[//]: # (CREATE INDEX members ON events &#40;contract_hash, to_hash&#41;;)
-
-[//]: # (```)
-
-[//]: # ()
-[//]: # (6. Check the [`graph-research` repo]&#40;https://github.com/cent-inc/graph-research&#41; for a further auxillary table to create &#40;`collection_owner`&#41; which is a user <> collection pair to map a user to a collection regardless of # of NFTs they have in that collection.)
-
-[//]: # ()
-[//]: # (Now your database should persist all of the historical data in the volume! If you want to reset this, follow the below instructions.)
-
-[//]: # ()
-[//]: # (### How do start the local database from scratch?)
-
-[//]: # ()
-[//]: # (You need to stop the docker container &#40;see above&#41;)
-
-[//]: # ()
-[//]: # (* UI: From your docker application dashboard -> volumes, remove cent-social-index_pgdata volume)
-
-[//]: # (* Bash:)
-
-[//]: # ()
-[//]: # (```bash)
-
-[//]: # ($ docker volume rm cent-social-index_pgdata)
-
-[//]: # (```)
+```
 
 ### Why 4500000 Block Floor?
 

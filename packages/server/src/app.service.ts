@@ -1,4 +1,3 @@
-import * as Jaccard from 'jaccard-index'
 import { Injectable, Logger } from '@nestjs/common'
 import { AnyblockService } from 'src/anyblock/anyblock.service'
 import { EventsService } from 'src/events/events.service'
@@ -17,37 +16,6 @@ export class AppService {
     private readonly dumpedBlocksService: DumpedBlocksService,
     private readonly collectionOwnerService: CollectionOwnerService
   ) {}
-
-  async jaccard() {
-    const address = '0x60DD04260484B6A3771F99807F62d9897371fa0c'
-    const collections = await this.collectionOwnerService.findByOwner(address)
-    if (collections.length > 0) {
-      const userSet = collections.map(c => c.contract_hash)
-      const othersCollections = await this.collectionOwnerService.findSharedCollections(address, userSet)
-
-      const othersCollectionsMap = {}
-      othersCollections.forEach(c => {
-        if (!othersCollectionsMap[c.owner]) {
-          othersCollectionsMap[c.owner] = []
-        }
-        othersCollectionsMap[c.owner].push(c.contract_hash)
-      })
-
-      const ranked = Object.keys(othersCollectionsMap)
-        .map(address => ({
-          a: address,
-          s: Jaccard().index(userSet, othersCollectionsMap[address]).toFixed(3)
-        }))
-        .sort((a, b) => (a.s < b.s ? 1 : -1))
-
-      return {
-        collections: userSet,
-        rank: ranked.slice(0, 10)
-      }
-    } else {
-      return { collections: [], rank: [] }
-    }
-  }
 
   async dump() {
     try {
@@ -76,7 +44,7 @@ export class AppService {
       const lastDumpedBlockNumber = hasLastDumpedBlock ? parseInt(lastDumpedBlock.number, 10) : 0
 
       // don't run again if there is a ceiling and if we have reached the last block
-      const hasReachedCeiling = hasRangeCeiling && hasLastDumpedBlock && lastDumpedBlockNumber === blockRangeCeiling
+      const hasReachedCeiling = hasRangeCeiling && hasLastDumpedBlock && lastDumpedBlockNumber >= blockRangeCeiling
       if (hasReachedCeiling) {
         this.logger.warn(`Reached ${Env.QueryBlockRangeCeiling}. Process complete.`)
         return
@@ -112,9 +80,13 @@ export class AppService {
           : lastChainBlockNumber
 
       const chainBlockToDump = await this.anyblockService.findBlockByNumber(blockRange.to)
+      // dump events
       const chainEvents = await this.anyblockService.findEventsByBlockRange({ ...blockRange })
-
       await this.eventsService.bulkCreate(chainEvents)
+      // dump collection owners
+      const chainCollectionOwners = await this.anyblockService.findCollectionOwnersByBlockRange({ ...blockRange })
+      await this.collectionOwnerService.bulkCreate(chainCollectionOwners)
+      // dump dumped blocks
       await this.dumpedBlocksService.create({ number: chainBlockToDump.number })
 
       this.dump()

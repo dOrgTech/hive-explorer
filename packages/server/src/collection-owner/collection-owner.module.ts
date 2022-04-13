@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common'
-import { CollectionOwnerService } from './collection-owner.service'
-import { collectionOwnerProviders } from './collectionOwnerProviders'
+import { CollectionOwnerService } from 'src/collection-owner/collection-owner.service'
+import { collectionOwnerProviders } from 'src/collection-owner/collection-owner.providers'
 
 @Module({
   providers: [...collectionOwnerProviders, CollectionOwnerService],

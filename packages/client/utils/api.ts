@@ -5,7 +5,7 @@ const getBaseURL = (): string => {
     case 'development':
       return 'http://localhost:5001'
     case 'production':
-      return ''
+      return 'https://j.cent.co'
     default:
       return ''
   }
@@ -13,13 +13,26 @@ const getBaseURL = (): string => {
 
 export const baseURL = getBaseURL()
 
+export const isAxiosError = axios.isAxiosError
+
 export type PingData = { message: string }
 
 export const ping = async () => {
   const res = await axios.request<PingData>({
     method: 'get',
     url: `${baseURL}/ping`,
-    transformResponse: r => JSON.parse(r)
+    transformResponse: res => JSON.parse(res)
+  })
+  return res.data
+}
+
+export type RankData = { collections: string[]; rank: { address: string; score: string }[] }
+
+export const getRankByAddress = async (address: string) => {
+  const res = await axios.request<RankData>({
+    method: 'get',
+    url: `${baseURL}/ranks/${address}`,
+    transformResponse: res => JSON.parse(res)
   })
   return res.data
 }

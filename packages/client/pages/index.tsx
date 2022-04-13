@@ -18,6 +18,8 @@ const Home: NextPage = () => {
 
   const handleNavigateToPing = () => router.push('/ping')
 
+  const handleNavigateToRank = () => router.push('/rank')
+
   return (
     <div
       className={classnames(
@@ -46,7 +48,19 @@ const Home: NextPage = () => {
           )}
           onClick={handleNavigateToPing}
         >
-          Ping Page
+          Ping The Server
+        </button>
+
+        <button
+          className={classnames(
+            styles['mt-16'],
+            styles['theme-btn'],
+            theme === 'light' ? styles['theme-btn-dark'] : null,
+            theme === 'dark' ? styles['theme-btn-light'] : null
+          )}
+          onClick={handleNavigateToRank}
+        >
+          Check Your ETH Address Rank
         </button>
 
         <p className={styles.description}>SCSS at work</p>
