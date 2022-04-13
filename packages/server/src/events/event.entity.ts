@@ -4,11 +4,11 @@ import { Table, Model, Column, DataType } from 'sequelize-typescript'
 export class Event extends Model {
   @Column({ type: DataType.CHAR(10) })
   block_number: string
-  @Column({ type: DataType.CHAR(66) })
+  @Column({ type: DataType.CHAR(42) })
   contract_hash: string
   @Column({ type: DataType.TEXT })
   nft_name: string
-  @Column({ type: DataType.CHAR(66) })
+  @Column({ type: DataType.CHAR(42) })
   txn_hash: string
   @Column({ type: DataType.CHAR(10) })
   txn_type: string

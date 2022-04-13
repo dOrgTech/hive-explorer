@@ -111,8 +111,6 @@ CREATE TABLE dumped_blocks (
     id              SERIAL PRIMARY KEY,
     number          VARCHAR(10),
     timestamp       DATE,
-    createdAt       DATE,
-    updatedAt       DATE
 );
 ```
 ```sql
@@ -120,7 +118,7 @@ CREATE TABLE events (
     id              INT PRIMARY KEY,
     block_number    VARCHAR(10),
     nft_name        TEXT,
-    contract_hash   VARCHAR(66),
+    contract_hash   VARCHAR(42),
     txn_hash        VARCHAR(66),
     txn_type        VARCHAR(10),
     gas             VARCHAR(32),
@@ -129,15 +127,13 @@ CREATE TABLE events (
     to_hash         VARCHAR(42),
     token_id        VARCHAR(78),
     timestamp       DATE,
-    createdAt       DATE,
-    updatedAt       DATE
 );
 
 ```
 ```sql
 CREATE TABLE collection_owner (
     id              SERIAL PRIMARY KEY,
-    contract_hash   VARCHAR(66),
+    contract_hash   VARCHAR(42),
     owner           VARCHAR(42)
 );
 ```
