@@ -22,11 +22,11 @@ const initialState: InitialState = {
 const Rank: NextPage = () => {
   const [loading, setLoading] = useState<InitialState['loading']>(initialState.loading)
   const [address, setAddress] = useState<InitialState['address']>(initialState.address)
-  const [rankData, setRakData] = useState<InitialState['rankData']>(initialState.rankData)
+  const [rankData, setRankData] = useState<InitialState['rankData']>(initialState.rankData)
   const [error, setError] = useState<InitialState['error']>(initialState.error)
 
   const resetStateForRequest = () => {
-    setRakData(initialState.rankData)
+    setRankData(initialState.rankData)
     setError(initialState.error)
   }
 
@@ -45,7 +45,7 @@ const Rank: NextPage = () => {
 
       setLoading(true)
       const data = await getRankByAddress(address)
-      setRakData(data)
+      setRankData(data)
     } catch (error) {
       if (isAxiosError(error)) {
         setError(error.response?.data?.message ?? error.message)

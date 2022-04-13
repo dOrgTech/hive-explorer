@@ -1,5 +1,5 @@
 import isEthereumAddress from 'validator/lib/isEthereumAddress'
-import { ethers } from 'ethers'
+import { ethers, getDefaultProvider } from 'ethers'
 import { Controller, Get, HttpException, HttpStatus, Param } from '@nestjs/common'
 import { RanksService } from 'src/ranks/ranks.service'
 import { ErrorMessage } from 'src/_constants/errors'
@@ -9,11 +9,14 @@ export class RanksController {
   constructor(private readonly ranksService: RanksService) {}
   @Get('/:address')
   async rank(@Param('address') address: string) {
-    if (!isEthereumAddress(address)) {
+    const provider = getDefaultProvider()
+    const resolvedAddress = await provider.resolveName(address.toLocaleLowerCase())
+
+    if (resolvedAddress == null || !isEthereumAddress(resolvedAddress)) {
       throw new HttpException(ErrorMessage.NotAnEthAddress, HttpStatus.BAD_REQUEST)
     }
 
-    const normalizedAddress = ethers.utils.getAddress(address.toLowerCase())
+    const normalizedAddress = ethers.utils.getAddress(resolvedAddress)
 
     try {
       return await this.ranksService.getRankByAddress(normalizedAddress)
