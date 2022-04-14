@@ -29,7 +29,7 @@ export class RanksService {
 
       return {
         collections: userSet,
-        rank: ranked.slice(0, 10)
+        rank: ranked.slice(0, 50)
       }
     } else {
       return { collections: [], rank: [] }
