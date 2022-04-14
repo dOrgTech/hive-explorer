@@ -30,6 +30,7 @@
     "@types/node": "17.0.23",
     "@types/react": "17.0.43",
     "@types/validator": "^13.7.2",
+    "autoprefixer": "^10.4.4",
     "babel-jest": "27.4.6",
     "eslint": "8.8.0",
     "eslint-config-next": "12.0.9",
@@ -38,7 +39,13 @@
     "eslint-plugin-prettier": "4.0.0",
     "eslint-plugin-testing-library": "5.0.5",
     "jest": "27.4.7",
+    "postcss": "^8.4.12",
+    "postcss-flexbugs-fixes": "^5.0.2",
+    "postcss-import": "^14.1.0",
+    "postcss-preset-env": "^7.4.3",
+    "precss": "^4.0.0",
     "prettier": "2.6.2",
+    "tailwindcss": "^3.0.24",
     "typescript": "4.6.3"
   }
 }

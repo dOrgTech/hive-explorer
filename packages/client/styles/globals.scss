@@ -1,17 +1,3 @@
-@import "_variables";
-
-html,
-body {
-  padding: 0;
-  margin: 0;
-  font-family: $font-family;
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-* {
-  box-sizing: border-box;
-}
+@import "~tailwindcss/base";
+@import "~tailwindcss/components";
+@import "~tailwindcss/utilities";

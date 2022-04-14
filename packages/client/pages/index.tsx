@@ -1,129 +1,93 @@
-import _ from 'lodash'
-import { useState } from 'react'
 import type { NextPage } from 'next'
-import { useRouter } from 'next/router'
-import Head from 'next/head'
 import Image from 'next/image'
-import classnames from 'classnames'
-import styles from '@/styles/home.module.scss'
+import React, { useState } from 'react'
+import { getRankByAddress, isAxiosError, RankData } from 'utils/api'
+import Nav from 'components/nav'
 
-type Theme = 'light' | 'dark'
+type InitialState = {
+  loading: boolean
+  address: string
+  rankData: RankData | null
+  error: string
+}
+
+const initialState: InitialState = {
+  loading: false,
+  address: '',
+  rankData: null,
+  error: ''
+}
 
 const Home: NextPage = () => {
-  const router = useRouter()
+  const [loading, setLoading] = useState<InitialState['loading']>(initialState.loading)
+  const [address, setAddress] = useState<InitialState['address']>(initialState.address)
+  const [rankData, setRankData] = useState<InitialState['rankData']>(initialState.rankData)
+  const [error, setError] = useState<InitialState['error']>(initialState.error)
 
-  const [theme, setTheme] = useState<Theme>('light')
+  const resetStateForRequest = () => {
+    setRankData(initialState.rankData)
+    setError(initialState.error)
+  }
 
-  const handleThemeChange = (theme: Theme) => setTheme(theme)
+  const handleSetAddress = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setAddress(event.target.value)
+  }
 
-  const handleNavigateToPing = () => router.push('/ping')
+  const handleGetRank = async (event: React.SyntheticEvent) => {
+    event.preventDefault()
+    resetStateForRequest()
 
-  const handleNavigateToRank = () => router.push('/rank')
+    try {
+      if (!address) {
+        throw new Error('Address field is empty')
+      }
+
+      setLoading(true)
+      const data = await getRankByAddress(address)
+      setRankData(data)
+    } catch (error) {
+      if (isAxiosError(error)) {
+        setError(error.response?.data?.message ?? error.message)
+        return
+      }
+
+      if (error instanceof Error) {
+        setError(error.message)
+        return
+      }
+
+      setError('Unknown Error')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
-    <div
-      className={classnames(
-        styles.container,
-        theme === 'light' && styles['container-light'],
-        theme === 'dark' && styles['container-dark']
-      )}
-    >
-      <Head>
-        <title>cent-social-index</title>
-        <meta name="description" content="Cent Social Index" />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://cent.app.bio">Cent Social Index</a>
-        </h1>
-
-        <p className={styles.description}>Check routing and and server api</p>
-        <button
-          className={classnames(
-            styles['theme-btn'],
-            theme === 'light' ? styles['theme-btn-dark'] : null,
-            theme === 'dark' ? styles['theme-btn-light'] : null
-          )}
-          onClick={handleNavigateToPing}
-        >
-          Ping The Server
-        </button>
-
-        <button
-          className={classnames(
-            styles['mt-16'],
-            styles['theme-btn'],
-            theme === 'light' ? styles['theme-btn-dark'] : null,
-            theme === 'dark' ? styles['theme-btn-light'] : null
-          )}
-          onClick={handleNavigateToRank}
-        >
-          Check Your ETH Address Rank
-        </button>
-
-        <p className={styles.description}>SCSS at work</p>
-        {theme === 'light' && (
-          <button
-            className={classnames(styles['theme-btn'], styles['theme-btn-dark'])}
-            onClick={() => handleThemeChange('dark')}
-          >
-            {_.startCase('dark theme')}
-          </button>
-        )}
-        {theme === 'dark' && (
-          <button
-            className={classnames(styles['theme-btn'], styles['theme-btn-light'])}
-            onClick={() => handleThemeChange('light')}
-          >
-            {_.startCase('light theme')}
-          </button>
-        )}
-
-        <p className={styles.description}>
-          Get started by editing <code className={styles.code}>pages/index.tsx</code>
-        </p>
-
-        <p className={styles.description}>Next.js Docs</p>
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h2>Documentation &rarr;</h2>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h2>Learn &rarr;</h2>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a href="https://github.com/vercel/next.js/tree/canary/examples" className={styles.card}>
-            <h2>Examples &rarr;</h2>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h2>Deploy &rarr;</h2>
-            <p>Instantly deploy your Next.js site to a public URL with Vercel.</p>
-          </a>
-        </div>
-      </main>
-
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <span className={styles.logo}>
-            <Image src="/vercel.svg" alt="Vercel Logo" width={72} height={16} />
-          </span>
-        </a>
-      </footer>
+    <div className="bg-white dark:bg-violet-600 h-screen w-screen">
+      <Nav />
+      <div className="flex justify-center align-middle pt-4 pb-4">
+        <Image className="rounded-[50px]" src="/cent_logo.png" alt="logo" width={96} height={96} />
+      </div>
+      <h1 className="text-center text-white text-5xl">Social Index</h1>
+      <form onSubmit={handleGetRank}>
+        <label>
+          Eth Address
+          <input type="text" value={address} onChange={handleSetAddress} />
+        </label>
+        <input type="submit" value="Submit" />
+      </form>
+      <div>
+        {loading ? <h5>Loading...</h5> : null}
+        {error ? <h5>{error}</h5> : null}
+        {rankData ? (
+          <>
+            <h5>Rank Data</h5>
+            <pre>
+              <code>{JSON.stringify(rankData, null, 2)}</code>
+            </pre>
+          </>
+        ) : null}
+      </div>
     </div>
   )
 }
