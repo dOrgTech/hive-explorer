@@ -1,4 +1,5 @@
 import type { NextPage } from 'next'
+import Script from 'next/script'
 import Link from 'next/link'
 import Head from 'next/head'
 import classnames from 'classnames'
@@ -46,12 +47,14 @@ const drawImage = (d: RankData) => {
 
   const vis = svg.datum(data).selectAll('.node').data(pack.nodes).enter().append('g')
 
-  const titles = vis.append('title')
+  const titles = vis
+    .append('title')
     .attr('x', (d: any) => d.x)
     .attr('y', (d: any) => d.y)
     .text((d: any) => (d.children ? '' : `${d.name}: ${format(d.value)}`))
 
-  const circles = vis.append('circle')
+  const circles = vis
+    .append('circle')
     .style('fill', (d: any) => {
       if (d.children) {
         return 'transparent'
@@ -76,7 +79,7 @@ const copyImage = () => {
   canvas.height = height
   const context = canvas.getContext('2d')
   img.src = data
-  img.onload = function() {
+  img.onload = () => {
     context?.drawImage(img, 0, 0, width, height)
     canvas.toBlob(blob => {
       const item = new ClipboardItem({ 'image/png': blob as ClipboardItemDataType })
@@ -136,7 +139,7 @@ const Rank: NextPage = () => {
   return (
     <div className={classnames(styles.container)}>
       <Head>
-        <script src="https://d3js.org/d3.v3.min.js"></script>
+        <Script src="https://d3js.org/d3.v3.min.js"></Script>
       </Head>
       <button>
         <Link href="/">/index</Link>
