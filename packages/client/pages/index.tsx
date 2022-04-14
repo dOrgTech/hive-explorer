@@ -1,5 +1,4 @@
 import type { NextPage } from 'next'
-import Image from 'next/image'
 import React, { useState } from 'react'
 import { getRankByAddress, isAxiosError, RankData } from 'utils/api'
 import Nav from 'components/nav'
@@ -65,10 +64,6 @@ const Home: NextPage = () => {
   return (
     <div className="bg-white dark:bg-violet-600 h-screen w-screen">
       <Nav />
-      <div className="flex justify-center align-middle pt-4 pb-4">
-        <Image className="rounded-[50px]" src="/cent_logo.png" alt="logo" width={96} height={96} />
-      </div>
-      <h1 className="text-center text-white text-5xl">Social Index</h1>
       <form onSubmit={handleGetRank}>
         <label>
           Eth Address
