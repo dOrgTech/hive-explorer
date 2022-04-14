@@ -1,7 +1,8 @@
-import type { NextPage } from 'next'
 import React, { useState } from 'react'
+import type { NextPage } from 'next'
 import { getRankByAddress, isAxiosError, RankData } from 'utils/api'
 import Nav from 'components/nav'
+import D3Chart, { drawImage, removeImage } from 'components/d3chart'
 
 type InitialState = {
   loading: boolean
@@ -35,7 +36,7 @@ const Home: NextPage = () => {
   const handleGetRank = async (event: React.SyntheticEvent) => {
     event.preventDefault()
     resetStateForRequest()
-
+    removeImage()
     try {
       if (!address) {
         throw new Error('Address field is empty')
@@ -44,6 +45,7 @@ const Home: NextPage = () => {
       setLoading(true)
       const data = await getRankByAddress(address)
       setRankData(data)
+      drawImage(data)
     } catch (error) {
       if (isAxiosError(error)) {
         setError(error.response?.data?.message ?? error.message)
@@ -71,6 +73,7 @@ const Home: NextPage = () => {
         </label>
         <input type="submit" value="Submit" />
       </form>
+      <D3Chart />
       <div>
         {loading ? <h5>Loading...</h5> : null}
         {error ? <h5>{error}</h5> : null}
