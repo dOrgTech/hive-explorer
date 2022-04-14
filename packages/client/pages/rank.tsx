@@ -1,7 +1,6 @@
 import type { NextPage } from 'next'
 import Script from 'next/script'
 import Link from 'next/link'
-import Head from 'next/head'
 import classnames from 'classnames'
 import React, { useState } from 'react'
 import styles from '@/styles/home.module.scss'
@@ -138,9 +137,7 @@ const Rank: NextPage = () => {
 
   return (
     <div className={classnames(styles.container)}>
-      <Head>
-        <Script src="https://d3js.org/d3.v3.min.js"></Script>
-      </Head>
+      <Script src="https://d3js.org/d3.v3.min.js"></Script>
       <button>
         <Link href="/">/index</Link>
       </button>
