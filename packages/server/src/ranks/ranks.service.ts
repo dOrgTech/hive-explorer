@@ -12,6 +12,8 @@ export class RanksService {
       const userSet = collections.map(c => c.contract_hash)
       const othersCollections = await this.collectionOwnerService.findSharedCollections(address, userSet)
 
+      console.log()
+
       const othersCollectionsMap = {}
       othersCollections.forEach(c => {
         if (!othersCollectionsMap[c.owner]) {
@@ -29,7 +31,7 @@ export class RanksService {
 
       return {
         collections: userSet,
-        rank: ranked.slice(0, 10)
+        rank: ranked.slice(0, 50)
       }
     } else {
       return { collections: [], rank: [] }
