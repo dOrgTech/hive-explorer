@@ -76,20 +76,20 @@ const copyImage = () => {
 const shortAddress = (address: string) => address.substr(0, 8)
 
 type D3ChartProps = {
-  showCopyButton: boolean
+  show: boolean
 }
 
-const D3Chart = ({ showCopyButton }: D3ChartProps) => {
+const D3Chart = ({ show }: D3ChartProps) => {
   return (
     <div>
-      <div id="d3-chart-wrapper" />
-      {showCopyButton ? (
-        <div className="flex justify-center align-middle pt-4 pb-4">
+      <div className={show ? '' : 'invisible'} id="d3-chart-wrapper" />
+      {show ? (
+        <div className="flex justify-center align-middle">
           <button
             className="hadow bg-purple-800 hover:bg-purple-700 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-4 rounded"
             onClick={copyImage}
           >
-            Copy image
+            Copy Image
           </button>
         </div>
       ) : null}
