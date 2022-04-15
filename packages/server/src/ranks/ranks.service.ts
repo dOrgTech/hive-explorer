@@ -3,6 +3,8 @@ import { Injectable } from '@nestjs/common'
 import { CollectionOwnerService } from 'src/collection-owner/collection-owner.service'
 import { Contract, ethers, getDefaultProvider } from 'ethers'
 
+const SIMILAR_ADDRESS_COUNT = 50
+
 @Injectable()
 export class RanksService {
   constructor(private readonly collectionOwnerService: CollectionOwnerService) {}
@@ -40,9 +42,15 @@ export class RanksService {
         userSetNames.push(contractName)
       }));
 
+      const rankedSubset = ranked.slice(0, SIMILAR_ADDRESS_COUNT)
+      await Promise.all(rankedSubset.map(async (similarAddress) => {
+        similarAddress.address = 
+          await provider.lookupAddress(similarAddress.address) || similarAddress.address
+      }));
+
       return {
         collections: userSetNames,
-        rank: ranked.slice(0, 50)
+        rank: rankedSubset
       }
     } else {
       return { collections: [], rank: [] }
