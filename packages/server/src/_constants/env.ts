@@ -14,5 +14,6 @@ export enum Env {
   AnyblockDbPort = 'ANYBLOCK_DB_PORT',
   AnyblockDbUsername = 'ANYBLOCK_DB_USERNAME',
   AnyblockDbPassword = 'ANYBLOCK_DB_PASSWORD',
-  AnyblockDbDatabase = 'ANYBLOCK_DB_DATABASE'
+  AnyblockDbDatabase = 'ANYBLOCK_DB_DATABASE',
+  InfuraKey = 'INFURA_KEY'
 }
