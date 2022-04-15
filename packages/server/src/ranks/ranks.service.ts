@@ -1,6 +1,7 @@
 import * as Jaccard from 'jaccard-index'
 import { Injectable } from '@nestjs/common'
 import { CollectionOwnerService } from 'src/collection-owner/collection-owner.service'
+import { Contract, ethers, getDefaultProvider } from 'ethers'
 
 @Injectable()
 export class RanksService {
@@ -27,8 +28,20 @@ export class RanksService {
         }))
         .sort((a, b) => (a.score < b.score ? 1 : -1))
 
+      const contractAbi = [
+        "function name() view returns (string)"
+      ]
+      const provider = getDefaultProvider()
+
+      const userSetNames = [] as string[]
+      await Promise.all(userSet.map(async (contract_hash) => {
+        const contract = new ethers.Contract(contract_hash, contractAbi, provider) as Contract
+        const contractName = await contract.name()
+        userSetNames.push(contractName)
+      }));
+
       return {
-        collections: userSet,
+        collections: userSetNames,
         rank: ranked.slice(0, 50)
       }
     } else {
