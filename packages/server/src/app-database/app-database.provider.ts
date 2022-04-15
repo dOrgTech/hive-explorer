@@ -21,7 +21,7 @@ export const appDatabaseProvider = [
       const sequelize = new Sequelize(url, {
         logging: false,
         dialect: 'postgres',
-        define : {
+        define: {
           timestamps: false
         }
       })
