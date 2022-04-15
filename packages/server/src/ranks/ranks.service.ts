@@ -44,19 +44,31 @@ export class RanksService {
       const contractAbi = ['function name() view returns (string)']
       const provider = new ethers.providers.InfuraProvider(1, infuraKey)
 
-      const userSetNames = [] as string[]
-      await Promise.all(
+      const userSetNames = await Promise.all(
         userSet.map(async contract_hash => {
-          const contract = new ethers.Contract(contract_hash, contractAbi, provider) as Contract
-          const contractName = await contract.name()
-          userSetNames.push(contractName)
+          try {
+            const contract = new ethers.Contract(contract_hash, contractAbi, provider) as Contract
+            return await contract.name()
+          } catch (error) {
+            return contract_hash
+          }
         })
       )
 
-      const rankedSubset = ranked.slice(0, SIMILAR_ADDRESS_COUNT)
-      await Promise.all(
-        rankedSubset.map(async similarAddress => {
-          similarAddress.address = (await provider.lookupAddress(similarAddress.address)) || similarAddress.address
+      // const rankedSubset = ranked.slice(0, SIMILAR_ADDRESS_COUNT)
+      const rankedSubset = await Promise.all(
+        ranked.slice(0, SIMILAR_ADDRESS_COUNT).map(async record => {
+          let address: string
+          try {
+            address = (await provider.lookupAddress(record.address)) || record.address
+          } catch (error) {
+            address = record.address
+          }
+
+          return {
+            address,
+            score: record.score
+          }
         })
       )
 

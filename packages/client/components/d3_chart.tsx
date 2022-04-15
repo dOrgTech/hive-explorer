@@ -5,6 +5,20 @@ import { RankData } from 'utils/api'
 const width = 500
 const height = 500
 
+const hashCode = (str: string) => {
+  let hash = 0
+  for (let i = 0; i < str.length; i++) {
+    hash = str.charCodeAt(i) + ((hash << 5) - hash)
+  }
+  return hash
+}
+
+const intToRGB = (i: number) => {
+  const c = (i & 0x00ffffff).toString(16).toUpperCase()
+
+  return `#${'00000'.substring(0, 6 - c.length) + c}`
+}
+
 export const drawImage = (d: RankData) => {
   const floor = d.rank.length ? parseFloat(d.rank[d.rank.length - 1].score) : 0
   const data = {
@@ -41,7 +55,7 @@ export const drawImage = (d: RankData) => {
         return 'transparent'
       }
 
-      return '#' + d.name.substr(2, 6)
+      return intToRGB(hashCode(d.name))
     })
     .attr('cx', (d: any) => d.x)
     .attr('cy', (d: any) => d.y)
