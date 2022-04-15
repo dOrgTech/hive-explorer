@@ -3,13 +3,13 @@ import type { NextPage } from 'next'
 import classnames from 'classnames'
 import { getRankByAddress, isAxiosError, RankData } from 'utils/api'
 import Nav from 'components/nav'
-import D3Chart, { drawImage, removeImage } from 'components/d3chart'
+import D3Chart, { drawImage, removeImage } from 'components/d3_chart'
 
 type InitialState = {
   loading: boolean
   address: string
   rankData: RankData | null
-  showD3chartCopyBtn: boolean
+  showD3Chart: boolean
   error: string
 }
 
@@ -17,7 +17,7 @@ const initialState: InitialState = {
   loading: false,
   address: '',
   rankData: null,
-  showD3chartCopyBtn: false,
+  showD3Chart: false,
   error: ''
 }
 
@@ -25,14 +25,12 @@ const Home: NextPage = () => {
   const [loading, setLoading] = useState<InitialState['loading']>(initialState.loading)
   const [address, setAddress] = useState<InitialState['address']>(initialState.address)
   const [rankData, setRankData] = useState<InitialState['rankData']>(initialState.rankData)
-  const [showD3chartCopyBtn, setShowD3chartCopyBtn] = useState<InitialState['showD3chartCopyBtn']>(
-    initialState.showD3chartCopyBtn
-  )
+  const [showD3Chart, setShowD3Chart] = useState<InitialState['showD3Chart']>(initialState.showD3Chart)
   const [error, setError] = useState<InitialState['error']>(initialState.error)
 
   const resetStateForRequest = () => {
     setRankData(initialState.rankData)
-    setShowD3chartCopyBtn(initialState.showD3chartCopyBtn)
+    setShowD3Chart(initialState.showD3Chart)
     setError(initialState.error)
   }
 
@@ -53,7 +51,7 @@ const Home: NextPage = () => {
       const data = await getRankByAddress(address)
       setRankData(data)
       drawImage(data)
-      setShowD3chartCopyBtn(true)
+      setShowD3Chart(true)
     } catch (error) {
       if (isAxiosError(error)) {
         setError(error.response?.data?.message ?? error.message)
@@ -75,8 +73,8 @@ const Home: NextPage = () => {
     <div className="bg-white">
       <Nav />
       <div className="flex justify-center align-middle pt-4 pb-4">
-        <form className="w-full max-w-sm">
-          <div className="md:flex md:items-center mb-4">
+        <form className="w-full max-w-sm" onSubmit={handleGetRank}>
+          <div className="md:flex md:items-center">
             <div className="md:w-1/3">
               <label className="block text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4" form="inline-full-name">
                 Eth Address
@@ -93,11 +91,22 @@ const Home: NextPage = () => {
           </div>
           <div className="md:flex md:items-center">
             <div className="md:w-1/3" />
+            {error ? (
+              <span className="md:w-2/3 font-medium tracking-wide text-red-500 text-xs mt-1 ml-1">{error}</span>
+            ) : (
+              <span className="h-4" />
+            )}
+          </div>
+          <div className="md:flex md:items-center mt-4">
+            <div className="md:w-1/3" />
             <div className="md:w-2/3">
               <button
-                className="shadow bg-purple-800 hover:bg-purple-700 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-4 rounded"
-                type="button"
-                onClick={handleGetRank}
+                disabled={loading}
+                className={classnames(
+                  'shadow bg-purple-800 hover:bg-purple-700 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-4 rounded',
+                  loading ? 'bg-gray-500 hover:bg-gray-500' : null
+                )}
+                type="submit"
               >
                 Get Ranks
               </button>
@@ -106,14 +115,49 @@ const Home: NextPage = () => {
         </form>
       </div>
 
+      {loading ? (
+        <div className="flex justify-center align-middle pt-4 pb-4">
+          <svg
+            role="status"
+            className="mr-2 w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-purple-700"
+            viewBox="0 0 100 101"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
+              fill="currentColor"
+            />
+            <path
+              d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
+              fill="currentFill"
+            />
+          </svg>
+        </div>
+      ) : null}
       <div className="flex justify-center align-middle pt-4 pb-4">
-        <D3Chart showCopyButton={showD3chartCopyBtn} />
+        <D3Chart show={showD3Chart} />
       </div>
-      <div>
-        {loading ? <h5>Loading...</h5> : null}
-        {error ? <h5>{error}</h5> : null}
+
+      {showD3Chart ? (
+        <div className="flex justify-center align-middle pt-1 pb-1">
+          <svg
+            className="animate-bounce w-6 h-6 text-gray-900"
+            fill="none"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+          </svg>
+        </div>
+      ) : null}
+
+      <div className="flex sm:flex-col  md:flex-row justify-center align-middle p-2">
         {rankData ? (
-          <div className="flex justify-center align-middle pt-4 pb-4">
+          <div className="flex justify-center align-middle p-4">
             <table className="table-fixed">
               <thead>
                 <tr>
@@ -131,7 +175,7 @@ const Home: NextPage = () => {
           </div>
         ) : null}
         {rankData ? (
-          <div className="flex justify-center align-middle pt-4 pb-4">
+          <div className="flex justify-center align-middle p-4">
             <table className="table-fixed">
               <thead>
                 <tr>
