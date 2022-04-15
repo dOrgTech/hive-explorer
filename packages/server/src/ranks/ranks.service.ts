@@ -2,7 +2,7 @@ import * as Jaccard from 'jaccard-index'
 import { Injectable } from '@nestjs/common'
 import { CollectionOwnerService } from 'src/collection-owner/collection-owner.service'
 import { Contract, ethers, getDefaultProvider } from 'ethers'
-import { Keys } from 'src/_constants/keys'
+import { Env } from 'src/_constants/env'
 
 const SIMILAR_ADDRESS_COUNT = 50
 
@@ -34,7 +34,7 @@ export class RanksService {
       const contractAbi = [
         "function name() view returns (string)"
       ]
-      const provider = new ethers.providers.InfuraProvider(1, Keys.InfuraApiKey);
+      const provider = new ethers.providers.InfuraProvider(1, Env.InfuraApiKey);
 
       const userSetNames = [] as string[]
       await Promise.all(userSet.map(async (contract_hash) => {
