@@ -11,7 +11,12 @@ const customJestConfig = {
   testRegex: '(/tests/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$',
   setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
   moduleNameMapper: {
-    '^@/(.*)$': '<rootDir>/$1'
+    '^@/(.*)$': '<rootDir>/$1',
+    '^components/(.*)$': '<rootDir>/components/$1',
+    '^constants/(.*)$': '<rootDir>/constants/$1',
+    '^styles/(.*)$': '<rootDir>/styles/$1',
+    '^types/(.*)$': '<rootDir>/types/$1',
+    '^utils/(.*)$': '<rootDir>/utils/$1'
   },
   testEnvironment: 'jest-environment-jsdom',
   collectCoverage: true,

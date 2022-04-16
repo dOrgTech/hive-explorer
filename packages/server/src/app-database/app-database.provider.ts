@@ -18,7 +18,13 @@ export const appDatabaseProvider = [
       const password = config.get<string>(Env.AppDbPassword)
       const url = `postgresql://${username}:${password}@${host}:${port}/${database}`
 
-      const sequelize = new Sequelize(url, { dialect: 'postgres', define : { timestamps: false }})
+      const sequelize = new Sequelize(url, {
+        logging: false,
+        dialect: 'postgres',
+        define: {
+          timestamps: false
+        }
+      })
       sequelize.addModels([DumpedBlock, Event, CollectionOwner])
       // @TODO: maybe we don't need to sync in production (find a way to do migrations)
       await sequelize.sync()

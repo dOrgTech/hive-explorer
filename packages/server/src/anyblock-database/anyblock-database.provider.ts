@@ -16,6 +16,7 @@ export const anyblockDatabaseProvider = [
       const url = `postgresql://${username}:${password}@${host}:${port}/${database}`
 
       return new Sequelize(url, {
+        logging: false,
         dialect: 'postgres',
         dialectOptions: {
           ssl: {
