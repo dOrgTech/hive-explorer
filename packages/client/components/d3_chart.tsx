@@ -100,7 +100,7 @@ const D3Chart = ({ show }: D3ChartProps) => {
       {show ? (
         <div className="flex justify-center align-middle">
           <button
-            className="hadow bg-purple-800 hover:bg-purple-700 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-4 rounded"
+            className="shadow bg-purple-800 hover:bg-purple-700 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-4 rounded"
             onClick={copyImage}
           >
             Copy Image
