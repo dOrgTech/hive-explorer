@@ -15,5 +15,8 @@ export enum Env {
   AnyblockDbUsername = 'ANYBLOCK_DB_USERNAME',
   AnyblockDbPassword = 'ANYBLOCK_DB_PASSWORD',
   AnyblockDbDatabase = 'ANYBLOCK_DB_DATABASE',
-  InfuraKey = 'INFURA_KEY'
+  InfuraKey = 'INFURA_KEY',
+  PinataKey = 'PINATA_KEY',
+  PinataSecret = 'PINATA_SECRET',
+  EthereumKey = 'ETHEREUM_KEY'
 }

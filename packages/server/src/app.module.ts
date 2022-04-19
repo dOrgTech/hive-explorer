@@ -7,6 +7,7 @@ import { AnyblockModule } from 'src/anyblock/anyblock.module'
 import { DumpedBlocksModule } from 'src/dumped-blocks/dumped-blocks.module'
 import { EventsModule } from 'src/events/events.module'
 import { AppDatabaseModule } from 'src/app-database/app-database.module'
+import { TokenModule } from 'src/token/token.module'
 import { RanksModule } from 'src/ranks/ranks.module'
 import { CollectionOwnerModule } from 'src/collection-owner/collection-owner.module'
 
@@ -21,7 +22,8 @@ import { CollectionOwnerModule } from 'src/collection-owner/collection-owner.mod
     EventsModule,
     DumpedBlocksModule,
     CollectionOwnerModule,
-    RanksModule
+    RanksModule,
+    TokenModule
   ],
   controllers: [AppController],
   providers: [AppService, Logger]

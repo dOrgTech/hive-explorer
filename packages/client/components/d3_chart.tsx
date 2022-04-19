@@ -1,6 +1,8 @@
 import React from 'react'
 import * as d3 from 'd3'
-import { RankData } from 'utils/api'
+import { ethers } from 'ethers'
+import axios from 'axios'
+import { RankData, SignedTokenURI, createTokenMetadata } from 'utils/api'
 
 const width = 500
 const height = 500
@@ -87,6 +89,42 @@ const copyImage = () => {
   }
 }
 
+const mintImage = async () => {
+  const ethereum = (window as any).ethereum;
+  if (!ethereum) {
+    window.alert('No Web3 found')
+    return;
+  }
+
+  await ethereum.request({
+    method: 'eth_requestAccounts'
+  })
+  const provider = new ethers.providers.Web3Provider(ethereum)
+  const signer = provider.getSigner()
+
+  const svg = document.getElementById('d3-chart-wrapper')?.children[0]
+  const img = new Image()
+  const serializer: any = new XMLSerializer()
+  const svgStr = serializer.serializeToString(svg)
+  const data = 'data:image/svg+xml;base64,' + window.btoa(svgStr)
+
+  const canvas = document.createElement('canvas')
+  canvas.width = width
+  canvas.height = height
+  const context = canvas.getContext('2d')
+  img.src = data
+  img.onload = async () => {
+    context?.drawImage(img, 0, 0, width, height)
+    const image = canvas.toDataURL()
+    const timestamp = Math.floor(new Date().getTime() / 1000)
+    const signature = await signer.signMessage(`Minting my Hive. Timestamp: ${timestamp}`)
+    const address = await signer.getAddress()
+    console.log(timestamp, signature)
+    const result: SignedTokenURI = await createTokenMetadata(image, address, timestamp, signature)
+    console.log(result)
+  }
+}
+
 const shortAddress = (address: string) => address.substr(0, 8)
 
 type D3ChartProps = {
@@ -104,6 +142,13 @@ const D3Chart = ({ show }: D3ChartProps) => {
             onClick={copyImage}
           >
             Copy Image
+          </button>
+          &nbsp;
+          <button
+            className="hadow bg-purple-800 hover:bg-purple-700 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-4 rounded"
+            onClick={mintImage}
+          >
+            Mint Ξ0.01
           </button>
         </div>
       ) : null}
