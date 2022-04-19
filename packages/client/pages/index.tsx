@@ -69,6 +69,10 @@ const Home: NextPage = () => {
     }
   }
 
+  const generateOpenSeaProfileLink = (address: string) => {
+    return `https://opensea.io/${address}`
+  }
+
   return (
     <div className="bg-white">
       <Nav />
@@ -165,9 +169,9 @@ const Home: NextPage = () => {
                 </tr>
               </thead>
               <tbody>
-                {rankData.collections.map((address, index) => (
+                {rankData.collections.map(({collection_address, collection_name}, index) => (
                   <tr key={index} className={classnames(index % 2 ? 'bg-gray-100' : null)}>
-                    <td className="border px-4 py-2">{address}</td>
+                    <td className="border px-4 py-2">{collection_name ?? collection_address}</td>
                   </tr>
                 ))}
               </tbody>
@@ -184,9 +188,13 @@ const Home: NextPage = () => {
                 </tr>
               </thead>
               <tbody>
-                {rankData.rank.map(({ address, score }, index) => (
+                {rankData.rank.map(({ address, ens, score }, index) => (
                   <tr key={index} className={classnames(index % 2 ? 'bg-gray-100' : null)}>
-                    <td className="border px-4 py-2">{address}</td>
+                    <a 
+                      className="underline text-purple-600 hover:text-purple-800 visited:text-purple-600" 
+                      href={generateOpenSeaProfileLink(address)}>
+                      <td className="px-4 py-2">{ens ?? address}</td>
+                    </a>
                     <td className="border px-4 py-2">{score}</td>
                   </tr>
                 ))}

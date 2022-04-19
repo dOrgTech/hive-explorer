@@ -48,25 +48,26 @@ export class RanksService {
         userSet.map(async contract_hash => {
           try {
             const contract = new ethers.Contract(contract_hash, contractAbi, provider) as Contract
-            return await contract.name()
+            const name = await contract.name() as string
+            return {collection_address: contract_hash, collection_name: name}
           } catch (error) {
-            return contract_hash
+            return {collection_address: contract_hash, collection_name: null}
           }
         })
       )
 
-      // const rankedSubset = ranked.slice(0, SIMILAR_ADDRESS_COUNT)
       const rankedSubset = await Promise.all(
         ranked.slice(0, SIMILAR_ADDRESS_COUNT).map(async record => {
-          let address: string
+          let ens: string
           try {
-            address = (await provider.lookupAddress(record.address)) || record.address
+            ens = (await provider.lookupAddress(record.address)) || record.address
           } catch (error) {
-            address = record.address
+            ens = null
           }
 
           return {
-            address,
+            address: record.address,
+            ens: ens,
             score: record.score
           }
         })
