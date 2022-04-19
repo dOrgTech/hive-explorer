@@ -96,23 +96,25 @@ $ yarn workspace @cent-social-index/client add lodash
 
 ### How can I manually populate the database instead of running dumps?
 
-First, you'll need to download the `events.csv` from [dropbox](https://www.dropbox.com/s/k86snoabcto42mf/events.csv?dl=0) which is a 22gb file that has all NFT transfers from the first ever block that ERC-721 tokens existed (around block 4.6m).
+First, you'll need to download the `events.csv` from [Google Drive](https://drive.google.com/drive/folders/13e1oLtjr4nUlVz0w-OamFrYipSEXcjfV?usp=sharing) which is a 17gb file that has all NFT transfers from the first ever block that ERC-721 tokens existed (around block 4.6m).
 
 Once you've got the data file and installed Docker and have the PostgreSQL image running as described above, you'll want to load the data onto the image and persist it to the volume.
 
 *Note that due to the size of the data file, some of these steps might take a while — thus, while developing it might make sense to use a smaller subset of the data.*
 
-1. Connect to the Docker image in with your preferred DB client
+1. Run the server at least once (no dump mode) to get the db and table definitions created. They are shown below for informational purposes:
 
-2. Run the server at least once (no dump mode) to get the db and table definitions created
+<details>
+    <summary>Schema</summary>
 
 ```sql
 CREATE TABLE dumped_blocks (
     id              SERIAL PRIMARY KEY,
     number          VARCHAR(10),
-    timestamp       DATE,
+    timestamp       DATE
 );
 ```
+
 ```sql
 CREATE TABLE events (
     id              INT PRIMARY KEY,
@@ -130,6 +132,7 @@ CREATE TABLE events (
 );
 
 ```
+
 ```sql
 CREATE TABLE collection_owner (
     id              SERIAL PRIMARY KEY,
@@ -137,9 +140,20 @@ CREATE TABLE collection_owner (
     owner           VARCHAR(42)
 );
 ```
+</details>
+
+2. Connect to the Docker image in with your preferred DB client
 
 
-Note: You can apply these indexes to speedy up the steps below
+3. Move the `.csv` file from your host machine to the container.
+    * You can get the container_id of the container by running `docker ps` on the command line
+
+```bash
+$ docker cp /path/events-table.csv container_id:/events-table.csv
+
+```
+
+4. Apply these indexes to speed up the steps below
 
 ```sql
 CREATE INDEX sender ON events (from_hash);
@@ -147,40 +161,32 @@ CREATE INDEX recipient ON events (to_hash);
 CREATE INDEX contract ON events (contract_hash);
 CREATE INDEX members ON events (contract_hash, to_hash);
 CREATE INDEX c_o_owner ON collection_owner (owner);
-CREATE INDEX c_o_name ON collection_owner (contract_hash);
+CREATE INDEX c_o_contract ON collection_owner (contract_hash);
 ```
 
-3. Then, you'll need to get move the `.csv` file form your host machine to the container.
-    * You can get the container_id of the container by running `docker ps` on the command line
-
-```bash
-$ docker cp /path/events.csv container_id:/events.csv
-
-```
-
-4. Now, populate the Postgres DB by running the following query which copies the `.csv` data into the DB volume
+5. Now, populate the Postgres DB by running the following query which copies the `.csv` data into the DB volume
 
 ```sql
-COPY events(id, block_number, contract_hash, nft_name, txn_hash, txn_type, gas, value, from_hash, to_hash, token_id, timestamp, createdat, updatedat)
-FROM '/events.csv'
+COPY events(id, block_number, contract_hash, nft_name, txn_hash, txn_type, gas, value, from_hash, to_hash, token_id, timestamp)
+FROM '/events-table.csv'
 DELIMITER ','
 CSV HEADER;
 ```
 
-5. Create records on collection_owner table from events table
+6. Create records on collection_owner table from events table
 
 ```sql
 INSERT INTO collection_owner (contract_hash, owner)
 SELECT DISTINCT contract_hash, to_hash
 FROM events;
 ```
-6. Create last dumped block record on dumped_blocks table from events table
+
+7. Create last dumped block record on dumped_blocks table from events table
+
 ```sql
-INSERT INTO dumped_blocks ("number", "updatedAt", "createdAt")
+INSERT INTO dumped_blocks ("number")
 VALUES (
-    (SELECT MAX(block_number::DECIMAL) as block_number FROM events),
-    NOW(),
-    NOW()
+    (SELECT MAX(block_number::DECIMAL) as block_number FROM events)
 );
 ```
 
