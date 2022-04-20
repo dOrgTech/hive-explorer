@@ -13,11 +13,22 @@ export class TokenService {
     private readonly configService: ConfigService
   ) {}
 
-  async uploadToIPFS(image: string) {
+  async uploadToIPFS(image: string, address: string) {
+    const infuraKey = this.configService.get(Env.InfuraKey)
     const pinataKey = this.configService.get(Env.PinataKey)
     const pinataSecret = this.configService.get(Env.PinataSecret)
-    console.log(pinataKey, pinataSecret)
     const wallet = new ethers.Wallet(this.configService.get(Env.EthereumKey))
+
+    if (!infuraKey) {
+      throw new Error('INFURA_KEY not present')
+    }
+
+    const provider = new ethers.providers.InfuraProvider(1, infuraKey)
+
+    let name = address
+    try {
+      name = (await provider.lookupAddress(address)) || name
+    } catch (error) { }
 
     const imageForm = new FormData() as any
     imageForm.append('file', Buffer.from(Base64.toUint8Array(image.replace('data:image/png;base64,', ''))), {
@@ -37,7 +48,7 @@ export class TokenService {
     const imageURI = `ipfs://${imageUpload.data.IpfsHash}`;
 
     const metadataUpload = await axios.post('https://api.pinata.cloud/pinning/pinJSONToIPFS', {
-      name: 'Hive',
+      name: `hive://${name}`,
       image: imageURI,
       description: 'A graph of NFT holders grouped by Jaccard similarity scores',
       external_url: 'https://hive.cent.co'
@@ -49,7 +60,10 @@ export class TokenService {
       }
     });
     const tokenURI = `ipfs://${metadataUpload.data.IpfsHash}`
-    const signature = await wallet.signMessage(tokenURI)
+    const message = ethers.utils.defaultAbiCoder.encode(['string'], [tokenURI]);
+    const hash = ethers.utils.keccak256(message);
+    const signature = await wallet.signMessage(ethers.utils.arrayify(hash));
+
     return {
       tokenURI,
       signature

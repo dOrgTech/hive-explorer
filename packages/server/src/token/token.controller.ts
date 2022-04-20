@@ -14,7 +14,7 @@ export class TokenController {
     @Body('signature') signature: string
   ) {
     try {
-      const message = `Minting my Hive. Timestamp: ${timestamp}`
+      const message = `Minting my Hive.\n\nTimestamp: ${timestamp}`
       const recoveredSigner = ethers.utils.verifyMessage(message, signature)
       if (address != recoveredSigner) {
         throw new Error('Invalid signature')
@@ -23,7 +23,7 @@ export class TokenController {
       if (Math.abs(now - parseInt(timestamp)) > 300) {
         throw new Error('Expired signature')
       }
-      return await this.tokenService.uploadToIPFS(image)
+      return await this.tokenService.uploadToIPFS(image, address)
     } catch (error) {
       console.log(error.message)
       throw new HttpException(ErrorMessage.InternalServerError, HttpStatus.INTERNAL_SERVER_ERROR)

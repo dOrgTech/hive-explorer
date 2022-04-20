@@ -1,9 +1,11 @@
 import * as Jaccard from 'jaccard-index'
+import isEthereumAddress from 'validator/lib/isEthereumAddress'
 import { Injectable } from '@nestjs/common'
 import { CollectionOwnerService } from 'src/collection-owner/collection-owner.service'
 import { Contract, ethers } from 'ethers'
 import { ConfigService } from '@nestjs/config'
 import { Env } from 'src/_constants/env'
+import { ErrorMessage } from 'src/_constants/errors'
 
 @Injectable()
 export class RanksService {
@@ -21,10 +23,19 @@ export class RanksService {
       throw new Error('INFURA_KEY not present')
     }
 
-    const collections = await this.collectionOwnerService.findByOwner(address)
+    const provider = new ethers.providers.InfuraProvider(1, infuraKey)
+    const resolvedAddress = await provider.resolveName(address.toLocaleLowerCase())
+
+    if (resolvedAddress == null || !isEthereumAddress(resolvedAddress)) {
+      throw new Error(ErrorMessage.NotAnEthAddress)
+    }
+
+    const normalizedAddress = ethers.utils.getAddress(resolvedAddress)
+
+    const collections = await this.collectionOwnerService.findByOwner(normalizedAddress)
     if (collections.length > 0) {
       const userSet = collections.map(c => c.contract_hash)
-      const othersCollections = await this.collectionOwnerService.findSharedCollections(address, userSet)
+      const othersCollections = await this.collectionOwnerService.findSharedCollections(normalizedAddress, userSet)
 
       const othersCollectionsMap = {}
       othersCollections.forEach(c => {
@@ -42,7 +53,6 @@ export class RanksService {
         .sort((a, b) => (a.score < b.score ? 1 : -1))
 
       const contractAbi = ['function name() view returns (string)']
-      const provider = new ethers.providers.InfuraProvider(1, infuraKey)
 
       const userSetNames = await Promise.all(
         userSet.map(async contract_hash => {

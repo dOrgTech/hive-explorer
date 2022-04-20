@@ -42,7 +42,7 @@ export const getRankByAddress = async (address: string) => {
 
 export type SignedTokenURI = { tokenURI: string, signature: string }
 
-export const createTokenMetadata = async (image: string, address: string, timestamp: string, signature: string) => {
+export const createTokenMetadata = async (image: string, address: string, timestamp: number, signature: string) => {
   const res = await axios.request<SignedTokenURI>({
     method: 'post',
     url: `${baseURL}/token/upload`,
