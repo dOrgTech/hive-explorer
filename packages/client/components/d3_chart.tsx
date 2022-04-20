@@ -53,7 +53,13 @@ export const drawImage = (d: RankData) => {
     .sort((a: any, b: any) => -(a.value - b.value))
     .value((d: any) => d.size)
 
-  const svg = d3.select('#d3-chart-wrapper').append('svg').attr('width', diameter).attr('height', diameter)
+  const svg = d3
+    .select('#d3-chart-wrapper')
+    .append('svg')
+    .attr('width', diameter)
+    .attr('height', diameter)
+    .style('margin', '0 auto')
+
   const vis = svg.datum(data).selectAll('.node').data(pack.nodes).enter().append('g')
   addTitles(vis)
   addCircles(vis)
