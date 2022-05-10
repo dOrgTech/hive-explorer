@@ -37,10 +37,8 @@ const Nav = () => {
             </button>
           </div>
           <div className="flex-1 flex items-center justify-center">
-            <div className="flex-shrink-0 flex items-center">
-              <a href="https://cent.app.bio/">
-                <Image className="rounded-[50px]" src="/cent_logo.png" alt="logo" width={40} height={40} />
-              </a>
+            <div className="flex-shrink-0 flex items-center" style={{ fontWeight: 'bold', color: 'white' }}>
+              HIVE EXPLORER
             </div>
           </div>
         </div>

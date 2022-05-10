@@ -1,36 +1,45 @@
 import React from 'react'
 import * as d3 from 'd3'
-import { RankData } from 'utils/api'
+import { ethers, Contract } from 'ethers'
+import axios from 'axios'
+import { RankData, SignedTokenURI, createTokenMetadata } from 'utils/api'
+import { abi } from 'utils/abi'
 
-const width = 500
-const height = 500
-
-const hashCode = (str: string) => {
-  let hash = 0
-  for (let i = 0; i < str.length; i++) {
-    hash = str.charCodeAt(i) + ((hash << 5) - hash)
-  }
-  return hash
-}
-
-const intToRGB = (i: number) => {
-  const c = (i & 0x00ffffff).toString(16).toUpperCase()
-
-  return `#${'00000'.substring(0, 6 - c.length) + c}`
-}
+const renderDims = 1024
 
 export const drawImage = (d: RankData) => {
   const floor = d.rank.length ? parseFloat(d.rank[d.rank.length - 1].score) : 0
   const data = {
     name: '',
     children: d.rank.map(r => ({
-      name: shortAddress(r.address),
+      ens: r.ens,
+      name: r.address,
       size: 1000 * (parseFloat(r.score) - floor) + 10
     }))
   }
 
-  const diameter = width
-  const format = Math.floor
+  const diameter = Math.floor(Math.min(window.innerWidth * 0.5, window.innerHeight * 0.5, 1024))
+
+  const addTitles = (vis: any) =>
+    vis
+      .append('title')
+      .attr('x', (d: any) => d.x)
+      .attr('y', (d: any) => d.y)
+      .text((d: any) => (d.children ? '' : d.ens))
+
+  const addCircles = (vis: any) =>
+    vis
+      .append('circle')
+      .style('fill', (d: any) => {
+        if (d.children) {
+          return 'transparent'
+        }
+
+        return `#${d.name.substr(2, 6)}`
+      })
+      .attr('cx', (d: any) => d.x)
+      .attr('cy', (d: any) => d.y)
+      .attr('r', (d: any) => d.r)
 
   const pack = d3.layout
     .pack()
@@ -38,72 +47,124 @@ export const drawImage = (d: RankData) => {
     .sort((a: any, b: any) => -(a.value - b.value))
     .value((d: any) => d.size)
 
-  const svg = d3.select('#d3-chart-wrapper').append('svg').attr('width', diameter).attr('height', diameter)
+  const packShadow = d3.layout
+    .pack()
+    .size([renderDims - 4, renderDims - 4])
+    .sort((a: any, b: any) => -(a.value - b.value))
+    .value((d: any) => d.size)
+
+  const svg = d3
+    .select('#d3-chart-wrapper')
+    .append('svg')
+    .attr('width', diameter)
+    .attr('height', diameter)
+    .style('margin', '0 auto')
 
   const vis = svg.datum(data).selectAll('.node').data(pack.nodes).enter().append('g')
+  addTitles(vis)
+  addCircles(vis)
 
-  const titles = vis
-    .append('title')
-    .attr('x', (d: any) => d.x)
-    .attr('y', (d: any) => d.y)
-    .text((d: any) => (d.children ? '' : `${d.name}: ${format(d.value)}`))
-
-  const circles = vis
-    .append('circle')
-    .style('fill', (d: any) => {
-      if (d.children) {
-        return 'transparent'
-      }
-
-      return intToRGB(hashCode(d.name))
-    })
-    .attr('cx', (d: any) => d.x)
-    .attr('cy', (d: any) => d.y)
-    .attr('r', (d: any) => d.r)
+  const shadowSvg = d3
+    .select('#d3-chart-wrapper-shadow')
+    .append('svg')
+    .attr('width', renderDims)
+    .attr('height', renderDims)
+  const shadowVis = shadowSvg.datum(data).selectAll('.node').data(packShadow.nodes).enter().append('g')
+  addTitles(shadowVis)
+  addCircles(shadowVis)
 }
 
 export const removeImage = () => {
   document.getElementById('d3-chart-wrapper')!.innerHTML = ''
+  document.getElementById('d3-chart-wrapper-shadow')!.innerHTML = ''
 }
 
-const copyImage = () => {
-  const svg = document.getElementById('d3-chart-wrapper')?.children[0]
-  const img = new Image()
+const svgToCanvas = (callback: Function) => {
+  const svg = document.getElementById('d3-chart-wrapper-shadow')!.children[0]
   const serializer: any = new XMLSerializer()
   const svgStr = serializer.serializeToString(svg)
   const data = 'data:image/svg+xml;base64,' + window.btoa(svgStr)
 
   const canvas = document.createElement('canvas')
-  canvas.width = width
-  canvas.height = height
-  const context = canvas.getContext('2d')
+  canvas.width = renderDims
+  canvas.height = renderDims
+  const img = new Image()
   img.src = data
   img.onload = () => {
-    context?.drawImage(img, 0, 0, width, height)
-    canvas.toBlob(blob => {
+    canvas.getContext('2d')?.drawImage(img, 0, 0, renderDims, renderDims)
+    callback(canvas)
+  }
+}
+
+const copyImage = () => {
+  svgToCanvas((canvas: HTMLCanvasElement) => {
+    canvas.toBlob((blob: any) => {
       const item = new ClipboardItem({ 'image/png': blob as ClipboardItemDataType })
       navigator.clipboard.write([item])
     })
+  })
+}
+
+const mintImage = async (addressOrENS: string) => {
+  const ethereum = (window as any).ethereum
+  if (!ethereum) {
+    window.alert('No Web3 found')
+    return
   }
+
+  await ethereum.request({
+    method: 'eth_requestAccounts'
+  })
+  const provider = new ethers.providers.Web3Provider(ethereum)
+  let resolvedAddress = addressOrENS
+  if (addressOrENS.includes('.eth')) {
+    addressOrENS = (await provider.resolveName(addressOrENS)) || addressOrENS
+  }
+  const signer = provider.getSigner()
+  const address = await signer.getAddress()
+  if (address != addressOrENS) {
+    window.alert('Mint your own')
+    return
+  }
+  const contract = new Contract('0xc5195f83dd41a5dc1b0d493dc44aa4a4bc4cd076', abi, signer)
+
+  svgToCanvas(async (canvas: HTMLCanvasElement) => {
+    const image = canvas.toDataURL()
+    const timestamp = Math.floor(new Date().getTime() / 1000)
+    const signature = await signer.signMessage(`Minting my Hive.\n\nTimestamp: ${timestamp}`)
+    const result: SignedTokenURI = await createTokenMetadata(image, address, timestamp, signature)
+    await contract.mint(result.tokenURI, result.signature, {
+      value: ethers.utils.parseEther('0.01')
+    })
+  })
 }
 
 const shortAddress = (address: string) => address.substr(0, 8)
 
 type D3ChartProps = {
   show: boolean
+  addressOrENS: string
 }
 
-const D3Chart = ({ show }: D3ChartProps) => {
+const D3Chart = ({ show, addressOrENS }: D3ChartProps) => {
   return (
     <div>
       <div className={show ? '' : 'invisible'} id="d3-chart-wrapper" />
+      <div style={{ display: 'none' }} id="d3-chart-wrapper-shadow" />
       {show ? (
         <div className="flex justify-center align-middle">
           <button
-            className="hadow bg-purple-800 hover:bg-purple-700 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-4 rounded"
+            className="shadow bg-purple-800 hover:bg-purple-700 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-4 rounded"
             onClick={copyImage}
           >
             Copy Image
+          </button>
+          &nbsp;
+          <button
+            className="hadow bg-purple-800 hover:bg-purple-700 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-4 rounded"
+            onClick={() => mintImage(addressOrENS)}
+          >
+            Mint Ξ0.01
           </button>
         </div>
       ) : null}

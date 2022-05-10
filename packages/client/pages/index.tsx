@@ -32,6 +32,7 @@ const Home: NextPage = () => {
     setRankData(initialState.rankData)
     setShowD3Chart(initialState.showD3Chart)
     setError(initialState.error)
+    removeImage()
   }
 
   const handleSetAddress = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -40,7 +41,19 @@ const Home: NextPage = () => {
 
   const handleGetRank = async (event: React.SyntheticEvent) => {
     event.preventDefault()
-    removeImage()
+    loadRank(address)
+  }
+
+  const generateOpenSeaProfileLink = (address: string) => {
+    return `https://opensea.io/${address}`
+  }
+
+  const handleClickAddress = (address: string) => {
+    setTimeout(() => loadRank(address), 250)
+  }
+
+  const loadRank = async (address: string) => {
+    setAddress(address)
     resetStateForRequest()
     try {
       if (!address) {
@@ -74,19 +87,25 @@ const Home: NextPage = () => {
       <Nav />
       <div className="flex justify-center align-middle pt-4 pb-4">
         <form className="w-full max-w-sm" onSubmit={handleGetRank}>
-          <div className="md:flex md:items-center">
-            <div className="md:w-1/3">
-              <label className="block text-gray-500 font-bold md:text-right mb-1 md:mb-0 pr-4" form="inline-full-name">
-                Eth Address
-              </label>
-            </div>
-            <div className="md:w-2/3">
-              <input
-                className="bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-800"
-                type="text"
-                value={address}
-                onChange={handleSetAddress}
-              />
+          <div className="flex items-center">
+            <input
+              placeholder="eth address"
+              className="ml-4 bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-800"
+              type="text"
+              value={address}
+              onChange={handleSetAddress}
+            />
+            <div className="ml-4 mr-4">
+              <button
+                disabled={loading}
+                className={classnames(
+                  'shadow bg-purple-800 hover:bg-purple-700 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-4 rounded',
+                  loading ? 'bg-gray-500 hover:bg-gray-500' : null
+                )}
+                type="submit"
+              >
+                Explore
+              </button>
             </div>
           </div>
           <div className="md:flex md:items-center">
@@ -96,21 +115,6 @@ const Home: NextPage = () => {
             ) : (
               <span className="h-4" />
             )}
-          </div>
-          <div className="md:flex md:items-center mt-4">
-            <div className="md:w-1/3" />
-            <div className="md:w-2/3">
-              <button
-                disabled={loading}
-                className={classnames(
-                  'shadow bg-purple-800 hover:bg-purple-700 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-4 rounded',
-                  loading ? 'bg-gray-500 hover:bg-gray-500' : null
-                )}
-                type="submit"
-              >
-                Get Ranks
-              </button>
-            </div>
           </div>
         </form>
       </div>
@@ -136,7 +140,7 @@ const Home: NextPage = () => {
         </div>
       ) : null}
       <div className="flex justify-center align-middle pt-4 pb-4">
-        <D3Chart show={showD3Chart} />
+        <D3Chart show={showD3Chart} addressOrENS={address} />
       </div>
 
       {showD3Chart ? (
@@ -154,47 +158,73 @@ const Home: NextPage = () => {
           </svg>
         </div>
       ) : null}
-
-      <div className="flex sm:flex-col  md:flex-row justify-center align-middle p-2">
-        {rankData ? (
-          <div className="flex justify-center align-middle p-4">
-            <table className="table-fixed">
-              <thead>
-                <tr>
-                  <th className="w-1/2 px-4 py-2">Collections</th>
-                </tr>
-              </thead>
-              <tbody>
-                {rankData.collections.map((address, index) => (
-                  <tr key={index} className={classnames(index % 2 ? 'bg-gray-100' : null)}>
-                    <td className="border px-4 py-2">{address}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+      {!showD3Chart && !loading ? (
+        <div className="flex justify-center align-middle">
+          <div className="px-4 w-full max-w-lg">
+            <h2 style={{ fontSize: '150%' }}>
+              Welcome to the Hive Explorer, a project by{' '}
+              <a className="underline" href="https://cent.co">
+                Cent
+              </a>{' '}
+              and{' '}
+              <a className="underline" href="https://dorg.tech">
+                dOrg
+              </a>
+              .
+            </h2>
+            <p className="my-4">
+              This service lets you explore the relationship between addresses on the Ethereum blockchain. It combines
+              NFT ownership history with Jaccard similarity scoring to tell you which NFT collectors are most similar to
+              you.
+            </p>
           </div>
-        ) : null}
-        {rankData ? (
-          <div className="flex justify-center align-middle p-4">
-            <table className="table-fixed">
-              <thead>
-                <tr>
-                  <th className="w-1/2 px-4 py-2">Address</th>
-                  <th className="w-1/4 px-4 py-2">Score</th>
+        </div>
+      ) : null}
+      {rankData ? (
+        <div className="flex justify-center align-middle p-4">
+          <table className="table-fixed">
+            <thead>
+              <tr>
+                <th className="w-1/2 px-4 py-2">Address</th>
+                <th className="w-1/4 px-4 py-2">Score</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rankData.rank.map(({ address, ens, score }, index) => (
+                <tr key={index} className={classnames(index % 2 ? 'bg-gray-100' : null)}>
+                  <td
+                    className="border px-4 py-2"
+                    style={{ maxWidth: '75vw', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}
+                  >
+                    <span className="underline cursor-pointer" onClick={() => handleClickAddress(ens ?? address)}>
+                      {ens ?? address}
+                    </span>
+                  </td>
+                  <td className="border px-4 py-2">{score}</td>
                 </tr>
-              </thead>
-              <tbody>
-                {rankData.rank.map(({ address, score }, index) => (
-                  <tr key={index} className={classnames(index % 2 ? 'bg-gray-100' : null)}>
-                    <td className="border px-4 py-2">{address}</td>
-                    <td className="border px-4 py-2">{score}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ) : null}
-      </div>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : null}
+      {rankData ? (
+        <div className="flex justify-center align-middle p-4">
+          <table className="table-fixed">
+            <thead>
+              <tr>
+                <th className="w-1/2 px-4 py-2">Collections</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rankData.collections.map(({ collection_address, collection_name }, index) => (
+                <tr key={index} className={classnames(index % 2 ? 'bg-gray-100' : null)}>
+                  <td className="border px-4 py-2">{collection_name ?? collection_address}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : null}
     </div>
   )
 }

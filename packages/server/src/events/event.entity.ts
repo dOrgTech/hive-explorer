@@ -8,7 +8,7 @@ export class Event extends Model {
   contract_hash: string
   @Column({ type: DataType.TEXT })
   nft_name: string
-  @Column({ type: DataType.CHAR(42) })
+  @Column({ type: DataType.CHAR(66) })
   txn_hash: string
   @Column({ type: DataType.CHAR(10) })
   txn_type: string
