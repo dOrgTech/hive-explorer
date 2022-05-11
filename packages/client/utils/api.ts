@@ -3,7 +3,7 @@ import axios from 'axios'
 const getBaseURL = (): string => {
   switch (process.env.NODE_ENV) {
     case 'development':
-      // return 'http://localhost:5001'
+      return 'http://localhost:5001'
     case 'production':
       return 'https://j.cent.co'
     default:
