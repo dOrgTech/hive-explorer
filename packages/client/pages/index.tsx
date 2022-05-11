@@ -90,18 +90,20 @@ const Home: NextPage = () => {
           </p>
         </div>
       </div>
-      <div className="flex justify-center align-middle p-4">
-        <p>
-          Don't see a collection?{' '}
-          <a
-            className="underline"
-            href="https://airtable.com/shrHM6Vsw4uAHiGug"
-            target="_blank"
-          >
-            Submit
-          </a>{' '}
-          a collection to be added to Hive!
-        </p>
+      <div className="flex justify-center align-middle">
+        <div className="px-4 w-full max-w-lg">
+          <p className="my-4">
+            Don't see a collection?{' '}
+            <a
+              className="underline"
+              href="https://airtable.com/shrHM6Vsw4uAHiGug"
+              target="_blank"
+            >
+              Submit
+            </a>{' '}
+            a collection to be added to Hive!
+          </p>
+        </div>
       </div>
     </div>
   )
