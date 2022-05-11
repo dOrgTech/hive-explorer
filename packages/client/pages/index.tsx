@@ -225,6 +225,19 @@ const Home: NextPage = () => {
           </table>
         </div>
       ) : null}
+      <div className="flex justify-center align-middle p-4">
+        <p>
+          Don't see a collection?{' '}
+          <a
+            className="underline"
+            href="https://airtable.com/shrHM6Vsw4uAHiGug"
+            target="_blank"
+          >
+            Submit
+          </a>{' '}
+          a collection to be added to Hive!
+        </p>
+      </div>
     </div>
   )
 }
