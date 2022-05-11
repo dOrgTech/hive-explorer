@@ -144,7 +144,7 @@ const Home: NextPage = () => {
         </div>
       ) : null}
       <div className="flex justify-center align-middle pt-4 pb-4">
-        <D3Chart show={showD3Chart} addressOrENS={address} />
+        <D3Chart show={showD3Chart} graphAddressOrENS={address} />
       </div>
 
       {showD3Chart ? (
