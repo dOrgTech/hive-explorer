@@ -1,5 +1,12 @@
 import React from 'react'
 import * as d3 from 'd3'
+import {
+  useAccount,
+  useEnsAddress,
+  useSigner,
+  useProvider,
+  useContract,
+} from 'wagmi'
 import { ethers, Contract } from 'ethers'
 import axios from 'axios'
 import { RankData, SignedTokenURI, createTokenMetadata } from 'utils/api'
@@ -105,48 +112,45 @@ const copyImage = () => {
   })
 }
 
-const mintImage = async (addressOrENS: string) => {
-  const ethereum = (window as any).ethereum
-  if (!ethereum) {
-    window.alert('No Web3 found')
-    return
-  }
-
-  await ethereum.request({
-    method: 'eth_requestAccounts'
-  })
-  const provider = new ethers.providers.Web3Provider(ethereum)
-  let resolvedAddress = addressOrENS
-  if (addressOrENS.includes('.eth')) {
-    addressOrENS = (await provider.resolveName(addressOrENS)) || addressOrENS
-  }
-  const signer = provider.getSigner()
-  const address = await signer.getAddress()
-  if (address != addressOrENS) {
-    window.alert('Mint your own')
-    return
-  }
-  const contract = new Contract('0xc5195f83dd41a5dc1b0d493dc44aa4a4bc4cd076', abi, signer)
-
-  svgToCanvas(async (canvas: HTMLCanvasElement) => {
-    const image = canvas.toDataURL()
-    const timestamp = Math.floor(new Date().getTime() / 1000)
-    const signature = await signer.signMessage(`Minting my Hive.\n\nTimestamp: ${timestamp}`)
-    const result: SignedTokenURI = await createTokenMetadata(image, address, timestamp, signature)
-    await contract.mint(result.tokenURI, result.signature, {
-      value: ethers.utils.parseEther('0.01')
-    })
-  })
-}
-
 const shortAddress = (address: string) => address.substr(0, 8)
 
 type D3ChartProps = {
   show: boolean
-  addressOrENS: string
+  graphAddressOrENS: string
 }
 
-const D3Chart = ({ show, addressOrENS }: D3ChartProps) => {
+const D3Chart = ({ show, graphAddressOrENS }: D3ChartProps) => {
+  const provider = useProvider();
+  const { data: signer } = useSigner();
+  const contract = useContract({
+    addressOrName: '0xc5195f83dd41a5dc1b0d493dc44aa4a4bc4cd076',
+    contractInterface: abi,
+    signer
+  });
+  // Get connected wallet address
+  const { data, isError, isLoading } = useAccount();
+  const userAddress = data?.address;
+  // Get graph address if ENS name is passed
+  const { data: resolvedGraphAddress } = useEnsAddress({ name: graphAddressOrENS });
+  const graphAddress = resolvedGraphAddress ?? graphAddressOrENS;
+
+  const mintImage = async () => {
+    if (userAddress != graphAddress) {
+      window.alert('Mint your own')
+      return
+    }
+
+    svgToCanvas(async (canvas: HTMLCanvasElement) => {
+      const image = canvas.toDataURL()
+      const timestamp = Math.floor(new Date().getTime() / 1000)
+      const signature = await signer.signMessage(`Minting my Hive.\n\nTimestamp: ${timestamp}`)
+      const result: SignedTokenURI = await createTokenMetadata(image, address, timestamp, signature)
+      await contract.mint(result.tokenURI, result.signature, {
+        value: ethers.utils.parseEther('0.01')
+      })
+    })
+  }
+
   return (
     <div>
       <div className={show ? '' : 'invisible'} id="d3-chart-wrapper" />
@@ -162,7 +166,7 @@ const D3Chart = ({ show, addressOrENS }: D3ChartProps) => {
           &nbsp;
           <button
             className="hadow bg-purple-800 hover:bg-purple-700 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-4 rounded"
-            onClick={() => mintImage(addressOrENS)}
+            onClick={() => mintImage()}
           >
             Mint Ξ0.01
           </button>

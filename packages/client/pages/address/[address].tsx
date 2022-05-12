@@ -5,6 +5,7 @@ import classnames from 'classnames'
 import { getRankByAddress, isAxiosError, RankData } from 'utils/api'
 import Nav from 'components/nav'
 import D3Chart, { drawImage, removeImage } from 'components/d3_chart'
+import { ConnectButton } from '@rainbow-me/rainbowkit';
 
 type InitialState = {
   loading: boolean
@@ -101,6 +102,9 @@ const AddressPage: NextPage = () => {
   return (
     <div className="bg-white">
       <Nav />
+      <div className="fixed right-2 bottom-3 md:top-3">
+        <ConnectButton />
+      </div>
       <div className="flex justify-center align-middle pt-4 pb-4">
         <form className="w-full max-w-sm" onSubmit={handleSubmit}>
           <div className="flex items-center">
@@ -156,7 +160,7 @@ const AddressPage: NextPage = () => {
         </div>
       ) : null}
       <div className="flex justify-center align-middle pt-4 pb-4">
-        <D3Chart show={showD3Chart} addressOrENS={address} />
+        <D3Chart show={showD3Chart} graphAddressOrENS={address} />
       </div>
 
       {showD3Chart ? (
