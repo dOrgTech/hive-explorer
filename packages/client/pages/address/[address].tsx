@@ -65,35 +65,39 @@ const AddressPage: NextPage = () => {
     return `https://opensea.io/${address}`
   }
 
+  const loadRank = async (address: string) => {
+    setAddressInput(address)
+    resetStateForRequest()
+    try {
+      if (!address) {
+        throw new Error('Address field is empty')
+      }
+
+      setLoading(true)
+      const data = await getRankByAddress(address)
+      setRankData(data)
+      drawImage(data)
+      setShowD3Chart(true)
+    } catch (error) {
+      if (isAxiosError(error)) {
+        setError(error.response?.data?.message ?? error.message)
+        return
+      }
+
+      if (error instanceof Error) {
+        setError(error.message)
+        return
+      }
+
+      setError('Unknown Error')
+    } finally {
+      setLoading(false)
+    }
+  }
+
   useEffect(() => {
     if (address) {
-      setAddressInput(address)
-      resetStateForRequest()
-      try {
-        if (!address) {
-          throw new Error('Address field is empty')
-        }
-
-        setLoading(true)
-        const data = await getRankByAddress(address)
-        setRankData(data)
-        drawImage(data)
-        setShowD3Chart(true)
-      } catch (error) {
-        if (isAxiosError(error)) {
-          setError(error.response?.data?.message ?? error.message)
-          return
-        }
-
-        if (error instanceof Error) {
-          setError(error.message)
-          return
-        }
-
-        setError('Unknown Error')
-      } finally {
-        setLoading(false)
-      }
+      loadRank(address)
     }
   }, [address])
 
