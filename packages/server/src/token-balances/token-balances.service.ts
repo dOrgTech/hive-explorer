@@ -63,7 +63,6 @@ export class TokenBalancesService {
       VALUES ${values}
       ON CONFLICT (id) DO UPDATE SET balance = token_balances.balance + EXCLUDED.balance
       `
-      console.log(query)
       await this.tokenBalancesRepository.sequelize.query(query, { type: QueryTypes.INSERT, raw: true })
     }
   }
