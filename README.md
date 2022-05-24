@@ -1,14 +1,16 @@
-# ⛓ Cent.co Social Index
+# ⛓ Hive Explorer
 
 ## Description
 
-This is a collaborative research project between Cent.co x dOrg index significant NFT movements (transfers & mints for now) to try and glean insights as to the nature of these movements. It's our hope that we can learn something interesting about how NFTs trade hands through this on-chain data.
+This is a collaborative research project between Cent.co x dOrg to index NFT movements to try and glean insights as to the nature of these movements. It's our hope that we can learn something interesting about how NFTs trade hands through this on-chain data.
 
 The current tools we are using for are:
 
-* `Ethers` for getting transfer events from an ethereum node
+* `JSON-RPC` for getting transfer events from an Ethereum node
 * `Nest.js` for setting up a pluggable architecture around modules to easily change data sources / output if necessary
 * `Docker` for setting up a local postgres database
+
+You can see a live version running at https://hive.cent.co
 
 ## Dev Environment
 Examples of .env file are can be found in both client and server apps
