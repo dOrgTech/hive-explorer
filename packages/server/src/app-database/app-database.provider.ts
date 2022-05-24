@@ -2,9 +2,8 @@ import { Sequelize } from 'sequelize-typescript'
 import { ConfigService } from '@nestjs/config'
 import { Provider } from 'src/_constants/providers'
 import { Env } from 'src/_constants/env'
-import { DumpedBlock } from 'src/dumped-blocks/dumped-block.entity'
-import { Event } from 'src/events/event.entity'
-import { CollectionOwner } from 'src/collection-owner/collection-owner.entity'
+import { TransferEvent } from 'src/transfer-events/transfer-event.entity'
+import { TokenBalance } from 'src/token-balances/token-balance.entity'
 
 export const appDatabaseProvider = [
   {
@@ -25,7 +24,7 @@ export const appDatabaseProvider = [
           timestamps: false
         }
       })
-      sequelize.addModels([DumpedBlock, Event, CollectionOwner])
+      sequelize.addModels([TransferEvent, TokenBalance])
       // @TODO: maybe we don't need to sync in production (find a way to do migrations)
       await sequelize.sync()
       return sequelize

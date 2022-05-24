@@ -14,7 +14,7 @@
     "start:dev:dump": "yarn db:dev:start && cross-env NODE_ENV=development RUN_DUMP=true nest start --watch",
     "stop:dev": "yarn db:dev:stop",
     "start:debug": "yarn db:dev:start && cross-env NODE_ENV=development  nest start --debug --watch",
-    "start:prod": "NODE_ENV=production node dist/main",
+    "start:prod": "NODE_ENV=production RUN_DUMP=true node dist/main",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "cross-env NODE_ENV=test jest",
     "test:watch": "cross-env NODE_ENV=test jest --watch",

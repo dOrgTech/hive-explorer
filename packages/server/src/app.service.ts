@@ -1,68 +1,39 @@
 import { Injectable, Logger } from '@nestjs/common'
-import { AnyblockService } from 'src/anyblock/anyblock.service'
-import { EventsService } from 'src/events/events.service'
-import { DumpedBlocksService } from 'src/dumped-blocks/dumped-blocks.service'
+import { EthereumService } from 'src/ethereum/ethereum.service'
+import { TransferEventsService } from 'src/transfer-events/transfer-events.service'
+import { TokenBalancesService } from 'src/token-balances/token-balances.service'
 import { ConfigService } from '@nestjs/config'
 import { Env } from 'src/_constants/env'
-import { CollectionOwnerService } from './collection-owner/collection-owner.service'
 
 @Injectable()
 export class AppService {
   constructor(
     private readonly logger: Logger,
     private readonly configService: ConfigService,
-    private readonly anyblockService: AnyblockService,
-    private readonly eventsService: EventsService,
-    private readonly dumpedBlocksService: DumpedBlocksService,
-    private readonly collectionOwnerService: CollectionOwnerService
-  ) {}
+    private readonly ethereumService: EthereumService,
+    private readonly transferEventsService: TransferEventsService,
+    private readonly tokenBalancesService: TokenBalancesService
+  ) { }
+
+  private lastBlock: number = 0
+  private blockIncrement: number = 5000
+  private currentBlock: number = 0
 
   async dump() {
     try {
-      const blockRangeSize = parseInt(this.configService.get(Env.QueryBlockRangeSize), 10)
-      if (!Boolean(blockRangeSize)) {
-        this.logger.error(`${Env.QueryBlockRangeSize} is not a number or is missing from environment variables`)
-        return
+      // 1. check the latest block from the db and class
+      if (this.lastBlock == 0) {
+        // get the latest block
+        const latestEvent = await this.transferEventsService.findLatest()
+        if (latestEvent) {
+          this.lastBlock = latestEvent.block_number
+        }
       }
 
-      const blockRangeFloor = parseInt(this.configService.get(Env.QueryBlockRangeFloor), 10)
-      if (!Boolean(blockRangeFloor)) {
-        this.logger.error(`${Env.QueryBlockRangeFloor} is not a number or is missing from environment variables`)
-        return
-      }
-
-      const rawBlockRangeCeiling = this.configService.get(Env.QueryBlockRangeCeiling)
-      const blockRangeCeiling = parseInt(rawBlockRangeCeiling, 10)
-      if (rawBlockRangeCeiling && !Boolean(blockRangeCeiling)) {
-        this.logger.error(`${Env.QueryBlockRangeCeiling} is not a number`)
-        return
-      }
-      const hasRangeCeiling = Boolean(blockRangeCeiling)
-
-      const lastDumpedBlock = await this.dumpedBlocksService.findLastDumpedBlock()
-      const hasLastDumpedBlock = Boolean(lastDumpedBlock)
-      const lastDumpedBlockNumber = hasLastDumpedBlock ? parseInt(lastDumpedBlock.number, 10) : 0
-
-      // don't run again if there is a ceiling and if we have reached the last block
-      const hasReachedCeiling = hasRangeCeiling && hasLastDumpedBlock && lastDumpedBlockNumber >= blockRangeCeiling
-      if (hasReachedCeiling) {
-        this.logger.warn(`Reached ${Env.QueryBlockRangeCeiling}. Process complete.`)
-        return
-      }
-
-      let lastChainBlockNumber = 0
-      if (hasRangeCeiling) {
-        lastChainBlockNumber = blockRangeCeiling
-      } else {
-        const lastChainBlock = await this.anyblockService.findLastBlock()
-        lastChainBlockNumber = parseInt(lastChainBlock.number, 10)
-      }
-
-      const shouldScheduleNextRun =
-        !hasRangeCeiling && hasLastDumpedBlock && lastChainBlockNumber < lastDumpedBlockNumber + blockRangeSize
-
-      if (shouldScheduleNextRun) {
-        const timeout = 10_000
+      if (this.lastBlock > this.currentBlock - 10) {
+        // Wait until we are 10+ blocks off the head before polling
+        this.currentBlock = await this.ethereumService.getLatestBlockNumber()
+        const timeout = 100_000
         this.logger.log(`Scheduling next run in ${timeout} ms.`)
         setTimeout(() => {
           this.dump()
@@ -70,26 +41,39 @@ export class AppService {
         return
       }
 
-      const blockRange = { from: 0, to: 0 }
-      blockRange.from =
-        hasLastDumpedBlock && lastDumpedBlockNumber > blockRangeFloor ? lastDumpedBlockNumber : blockRangeFloor
+      // 2. scan the block range
 
-      blockRange.to =
-        blockRange.from + blockRangeSize < lastChainBlockNumber
-          ? blockRange.from + blockRangeSize
-          : lastChainBlockNumber
+      try {
+        const startBlock = this.lastBlock
+        const endBlock = Math.min(startBlock + this.blockIncrement, this.currentBlock)
+        this.logger.log(`SCAN: ${startBlock}\tTO: ${endBlock}\tBLOCKS: ${endBlock - startBlock}`)
+        const transferEvents = await this.ethereumService.findEventsByBlockRange(startBlock, endBlock)
+        this.logger.log(`NEW EVENTS: ${transferEvents.length}`)
 
-      const chainBlockToDump = await this.anyblockService.findBlockByNumber(blockRange.to)
-      // dump events
-      const chainEvents = await this.anyblockService.findEventsByBlockRange({ ...blockRange })
-      await this.eventsService.bulkCreate(chainEvents)
-      // dump collection owners
-      const chainCollectionOwners = await this.anyblockService.findCollectionOwnersByBlockRange({ ...blockRange })
-      await this.collectionOwnerService.bulkCreate(chainCollectionOwners)
-      // dump dumped blocks
-      await this.dumpedBlocksService.create({ number: chainBlockToDump.number })
+        // 3a. insert events into the table
+        if (transferEvents.length > 0) {
+          await this.transferEventsService.bulkCreate(transferEvents)
 
-      this.dump()
+          // 4. update user token balances table
+          await this.tokenBalancesService.bulkUpsert(transferEvents)
+
+          // 5. update the contract names, ens names
+        }
+        this.lastBlock = endBlock + 1
+        this.blockIncrement++ // Additive increase
+      }
+      catch (e) {
+        // 3b. if the range results in an error, reduce the size and retry
+        this.logger.error(e.message)
+        this.blockIncrement = Math.floor(this.blockIncrement / 2) // Multiplicative decrease
+        this.logger.error(`TRIMMING BLOCK RANGE TO: ${this.blockIncrement}`)
+      }
+
+      // Run it again
+      setTimeout(() => {
+        this.dump()
+      }, 0)
+
     } catch (error) {
       this.logger.error(error.message)
     }
