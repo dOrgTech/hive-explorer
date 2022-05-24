@@ -247,13 +247,14 @@ const AddressPage: NextPage = () => {
           </table>
         </div>
       ) : null}
+
       <div className="flex justify-center align-middle p-4">
         <p>
-          Don&apos;t see a collection?&nbsp;
-          <a className="underline" href="https://airtable.com/shrHM6Vsw4uAHiGug" target="_blank" rel="noreferrer">
-            Submit
-          </a>{' '}
-          a collection to be added to Hive!
+          Have a question?&nbsp;
+          <a className="underline" href="https://discord.gg/JjYUrPnDJT" target="_blank" rel="noreferrer">
+            Jump into our Discord
+          </a>
+          &nbsp;to chat with us!
         </p>
       </div>
     </div>

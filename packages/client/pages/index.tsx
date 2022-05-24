@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
-import Image from 'next/image'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
 import Head from 'next/head'
 
@@ -108,7 +107,7 @@ const Home: NextPage = () => {
       </div>
       <div className="flex justify-center align-middle">
         <div className="px-4 w-full max-w-lg">
-          <Image src="/hive-example.png" alt="hive-exmple" />
+          <img src="/hive-example.png" alt="hive-exmple" />
           <h2 style={{ fontSize: '150%' }}>Join the community: mint your HIVE token.</h2>
           <p className="my-4">
             Interested in exploring the future of web3 data? Mint your HIVE token then hop on over to our&nbsp;

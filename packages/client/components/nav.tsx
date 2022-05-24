@@ -40,7 +40,7 @@ const Nav = (props: any) => {
             <div
               onClick={props.onClickTitle}
               className="flex-shrink-0 flex items-center"
-              style={{ fontWeight: 'bold', color: 'white' }}
+              style={{ fontWeight: 'bold', color: 'white', cursor: 'pointer' }}
             >
               HIVE EXPLORER
             </div>
