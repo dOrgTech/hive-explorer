@@ -103,7 +103,7 @@ const AddressPage: NextPage = () => {
 
   return (
     <div className="bg-white">
-      <Nav />
+      <Nav onClickTitle={() => router.push('/')} />
       <div className="fixed right-2 bottom-3 md:top-3">
         <ConnectButton />
       </div>

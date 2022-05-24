@@ -25,7 +25,7 @@ export class RanksService {
       throw new Error(ErrorMessage.NotAnEthAddress)
     }
 
-    const normalizedAddress = ethers.utils.getAddress(resolvedAddress)
+    const normalizedAddress = ethers.utils.getAddress(resolvedAddress).toLowerCase()
 
     const collections = await this.tokenBalancesService.findCollectionsByOwner(normalizedAddress)
     if (collections.length > 0) {

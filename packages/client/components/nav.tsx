@@ -1,7 +1,7 @@
 import React from 'react'
 import Image from 'next/image'
 
-const Nav = () => {
+const Nav = (props: any) => {
   return (
     <nav className="bg-gray-800">
       <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
@@ -37,7 +37,11 @@ const Nav = () => {
             </button>
           </div>
           <div className="flex-1 flex items-center justify-center">
-            <div className="flex-shrink-0 flex items-center" style={{ fontWeight: 'bold', color: 'white' }}>
+            <div
+              onClick={props.onClickTitle}
+              className="flex-shrink-0 flex items-center"
+              style={{ fontWeight: 'bold', color: 'white' }}
+            >
               HIVE EXPLORER
             </div>
           </div>

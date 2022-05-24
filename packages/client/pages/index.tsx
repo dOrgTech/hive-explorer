@@ -1,7 +1,9 @@
 import React, { useState } from 'react'
 import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
+import Image from 'next/image'
 import { ConnectButton } from '@rainbow-me/rainbowkit'
+import Head from 'next/head'
 
 import classnames from 'classnames'
 import Nav from 'components/nav'
@@ -40,7 +42,17 @@ const Home: NextPage = () => {
 
   return (
     <div className="bg-white">
-      <Nav />
+      <Head>
+        <title>Hive</title>
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+        <link rel="manifest" href="/site.webmanifest" />
+        <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5" />
+        <meta name="msapplication-TileColor" content="#da532c" />
+        <meta name="theme-color" content="#ffffff" />
+      </Head>
+      <Nav onClickTitle={() => router.push('/')} />
       <div className="fixed right-2 bottom-3 md:top-3">
         <ConnectButton />
       </div>
@@ -77,7 +89,7 @@ const Home: NextPage = () => {
       <div className="flex justify-center align-middle">
         <div className="px-4 w-full max-w-lg">
           <h2 style={{ fontSize: '150%' }}>
-            Welcome to the Hive Explorer, a project by{' '}
+            Welcome to Hive, a project by{' '}
             <a className="underline" href="https://cent.co">
               Cent
             </a>{' '}
@@ -88,18 +100,23 @@ const Home: NextPage = () => {
             .
           </h2>
           <p className="my-4">
-            This service lets you explore the relationship between addresses on the Ethereum blockchain. It combines NFT
-            ownership history with Jaccard similarity scoring to tell you which NFT collectors are most similar to you.
+            This service explores public blockchain data to surface affinities and shared interests among collectors of
+            NFTs. This is a first proof of concept on Ethereum and uses a simple algorithm. In the future we plan to
+            index multiple blockchains and more robust matching.
           </p>
         </div>
       </div>
       <div className="flex justify-center align-middle">
         <div className="px-4 w-full max-w-lg">
+          <Image src="/hive-example.png" alt="hive-exmple" />
+          <h2 style={{ fontSize: '150%' }}>Join the community: mint your HIVE token.</h2>
           <p className="my-4">
-            Interested in making this service better? First your hive token then join our
+            Interested in exploring the future of web3 data? Mint your HIVE token then hop on over to our&nbsp;
             <a className="underline" href="https://discord.gg/JjYUrPnDJT" target="_blank" rel="noreferrer">
               Discord
             </a>
+            ! Start by entering your ETH address above. You will also be able to discover who shares the most NFTs in
+            common with you and mint your HIVE token.
           </p>
         </div>
       </div>
