@@ -21,6 +21,11 @@ export class AppService {
 
   async dump() {
     try {
+      // 0. Initialize the current block
+      if (this.currentBlock === 0) {
+        this.currentBlock = await this.ethereumService.getLatestBlockNumber()
+      }
+
       // 1. check the latest block from the db and class
       if (this.lastBlock == 0) {
         // get the latest block
