@@ -6,7 +6,7 @@ This is a collaborative research project between Cent.co x dOrg index significan
 
 The current tools we are using for are:
 
-* `AnyBlock` for SQL queries of on-chain data
+* `Ethers` for getting transfer events from an ethereum node
 * `Nest.js` for setting up a pluggable architecture around modules to easily change data sources / output if necessary
 * `Docker` for setting up a local postgres database
 
@@ -96,7 +96,7 @@ $ yarn workspace @cent-social-index/client add lodash
 
 ### How can I manually populate the database instead of running dumps?
 
-First, you'll need to download the `events.csv` from [Google Drive](https://drive.google.com/drive/folders/13e1oLtjr4nUlVz0w-OamFrYipSEXcjfV?usp=sharing) which is a 17gb file that has all NFT transfers from the first ever block that ERC-721 tokens existed (around block 4.6m).
+First, you'll need to download the db dump from [Google Drive](https://drive.google.com/drive/folders/13e1oLtjr4nUlVz0w-OamFrYipSEXcjfV?usp=sharing)
 
 Once you've got the data file and installed Docker and have the PostgreSQL image running as described above, you'll want to load the data onto the image and persist it to the volume.
 
@@ -108,87 +108,36 @@ Once you've got the data file and installed Docker and have the PostgreSQL image
     <summary>Schema</summary>
 
 ```sql
-CREATE TABLE dumped_blocks (
-    id              SERIAL PRIMARY KEY,
-    number          VARCHAR(10),
-    timestamp       DATE
+CREATE TABLE transfer_events (
+    id                  CHAR(30) PRIMARY KEY,
+    chain_id            INT,
+    contract_address    CHAR(42),
+    from_address        CHAR(42),
+    to_address          CHAR(42),
+    token_id            NUMERIC(78,0),
+    quantity            NUMERIC(78,0),
+    txn_id              CHAR(66),
+    block_number        INT
 );
 ```
 
 ```sql
-CREATE TABLE events (
-    id              INT PRIMARY KEY,
-    block_number    VARCHAR(10),
-    nft_name        TEXT,
-    contract_hash   VARCHAR(42),
-    txn_hash        VARCHAR(66),
-    txn_type        VARCHAR(10),
-    gas             VARCHAR(32),
-    value           VARCHAR(78),
-    from_hash       VARCHAR(42),
-    to_hash         VARCHAR(42),
-    token_id        VARCHAR(78),
-    timestamp       DATE,
-);
-
-```
-
-```sql
-CREATE TABLE collection_owner (
-    id              SERIAL PRIMARY KEY,
-    contract_hash   VARCHAR(42),
-    owner           VARCHAR(42)
+CREATE TABLE token_balances (
+    id                  CHAR(30) PRIMARY KEY,
+    chain_id            INT,
+    contract_address    CHAR(42),
+    owner_address       CHAR(42),
+    token_id            NUMERIC(78,0),
+    balance             NUMERIC(78,0)
 );
 ```
 </details>
 
-2. Connect to the Docker image in with your preferred DB client
+2. Connect to the Docker image and restore the dump
 
 
-3. Move the `.csv` file from your host machine to the container.
-    * You can get the container_id of the container by running `docker ps` on the command line
+`psql -U db_user db_name < dump_name.sql`
 
-```bash
-$ docker cp /path/events-table.csv container_id:/events-table.csv
-
-```
-
-4. Apply these indexes to speed up the steps below
-
-```sql
-CREATE INDEX sender ON events (from_hash);
-CREATE INDEX recipient ON events (to_hash);
-CREATE INDEX contract ON events (contract_hash);
-CREATE INDEX members ON events (contract_hash, to_hash);
-CREATE INDEX c_o_owner ON collection_owner (owner);
-CREATE INDEX c_o_contract ON collection_owner (contract_hash);
-```
-
-5. Now, populate the Postgres DB by running the following query which copies the `.csv` data into the DB volume
-
-```sql
-COPY events(id, block_number, contract_hash, nft_name, txn_hash, txn_type, gas, value, from_hash, to_hash, token_id, timestamp)
-FROM '/events-table.csv'
-DELIMITER ','
-CSV HEADER;
-```
-
-6. Create records on collection_owner table from events table
-
-```sql
-INSERT INTO collection_owner (contract_hash, owner)
-SELECT DISTINCT contract_hash, to_hash
-FROM events;
-```
-
-7. Create last dumped block record on dumped_blocks table from events table
-
-```sql
-INSERT INTO dumped_blocks ("number")
-VALUES (
-    (SELECT MAX(block_number::DECIMAL) as block_number FROM events)
-);
-```
 
 Now your database should persist the historical data in the volume! If you want to reset this, follow the below instructions.
 
@@ -208,30 +157,3 @@ You need to stop the docker container (see above)
 $ docker volume rm cent-social-index_pgdata
 
 ```
-
-### Why 4500000 Block Floor?
-
-For now we're only querying data related to `ERC721` and `ERC1155` tokens. The first `ERC721` token according to this query is [CryptoKitties](https://etherscan.io/address/0x06012c8cf97bead5deae237070f9587f8e7a266d), which launched on Nov. 23, 2017
-
-``` SQL
-SELECT address, name, created_at
-FROM token
-WHERE
-  (type = 'ERC721' OR type = 'ERC1155') AND
-  total_supply > 0
-ORDER BY created_at ASC
-LIMIT 10
-```
-
-From this, we can figure out which blocks were mined on that fateful day, and use a round number around then as our floor:
-
-``` SQL
-SELECT *
-FROM block
-WHERE
-  timestamp > '2017-11-23' AND
-  timestamp < '2017-11-24'
-LIMIT 10
-```
-
-This way we can save a lot of time, since we're not checking 5,000,000 blocks (30% of the corpus) that we're sure doesn't have any data we're looking for.

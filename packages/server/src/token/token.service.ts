@@ -1,6 +1,6 @@
 import axios from 'axios'
+import FormData from 'form-data'
 import * as Base64 from 'js-base64'
-import * as FormData from 'form-data'
 import * as Jaccard from 'jaccard-index'
 import { Injectable } from '@nestjs/common'
 import { Contract, ethers } from 'ethers'

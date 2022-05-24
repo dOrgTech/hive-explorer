@@ -1,7 +1,8 @@
 import * as Jaccard from 'jaccard-index'
 import isEthereumAddress from 'validator/lib/isEthereumAddress'
-import { Injectable } from '@nestjs/common'
-import { CollectionOwnerService } from 'src/collection-owner/collection-owner.service'
+import { Provider } from 'src/_constants/providers'
+import { Inject, Injectable } from '@nestjs/common'
+import { TokenBalancesService } from 'src/token-balances/token-balances.service'
 import { Contract, ethers } from 'ethers'
 import { ConfigService } from '@nestjs/config'
 import { Env } from 'src/_constants/env'
@@ -11,20 +12,14 @@ import { ErrorMessage } from 'src/_constants/errors'
 export class RanksService {
   constructor(
     private readonly configService: ConfigService,
-    private readonly collectionOwnerService: CollectionOwnerService
+    private readonly tokenBalancesService: TokenBalancesService,
+    @Inject(Provider.EthersProvider) private provider: ethers.providers.JsonRpcProvider
   ) {}
 
   async getRankByAddress(address: string) {
     const SIMILAR_ADDRESS_COUNT = 50
 
-    const infuraKey = this.configService.get(Env.InfuraKey)
-
-    if (!infuraKey) {
-      throw new Error('INFURA_KEY not present')
-    }
-
-    const provider = new ethers.providers.InfuraProvider(1, infuraKey)
-    const resolvedAddress = await provider.resolveName(address.toLocaleLowerCase())
+    const resolvedAddress = await this.provider.resolveName(address.toLocaleLowerCase())
 
     if (resolvedAddress == null || !isEthereumAddress(resolvedAddress)) {
       throw new Error(ErrorMessage.NotAnEthAddress)
@@ -32,17 +27,17 @@ export class RanksService {
 
     const normalizedAddress = ethers.utils.getAddress(resolvedAddress)
 
-    const collections = await this.collectionOwnerService.findByOwner(normalizedAddress)
+    const collections = await this.tokenBalancesService.findCollectionsByOwner(normalizedAddress)
     if (collections.length > 0) {
-      const userSet = collections.map(c => c.contract_hash)
-      const othersCollections = await this.collectionOwnerService.findSharedCollections(normalizedAddress, userSet)
+      const userSet = collections.map(c => c.contract_address)
+      const othersCollections = await this.tokenBalancesService.findSharedCollections(normalizedAddress, userSet)
 
       const othersCollectionsMap = {}
       othersCollections.forEach(c => {
-        if (!othersCollectionsMap[c.owner]) {
-          othersCollectionsMap[c.owner] = []
+        if (!othersCollectionsMap[c.owner_address]) {
+          othersCollectionsMap[c.owner_address] = []
         }
-        othersCollectionsMap[c.owner].push(c.contract_hash)
+        othersCollectionsMap[c.owner_address].push(c.contract_address)
       })
 
       const ranked = Object.keys(othersCollectionsMap)
@@ -55,13 +50,13 @@ export class RanksService {
       const contractAbi = ['function name() view returns (string)']
 
       const userSetNames = await Promise.all(
-        userSet.map(async contract_hash => {
+        userSet.map(async contract_address => {
           try {
-            const contract = new ethers.Contract(contract_hash, contractAbi, provider) as Contract
+            const contract = new ethers.Contract(contract_address, contractAbi, this.provider) as Contract
             const name = await contract.name() as string
-            return {collection_address: contract_hash, collection_name: name}
+            return {collection_address: contract_address, collection_name: name}
           } catch (error) {
-            return {collection_address: contract_hash, collection_name: null}
+            return {collection_address: contract_address, collection_name: null}
           }
         })
       )
@@ -70,7 +65,7 @@ export class RanksService {
         ranked.slice(0, SIMILAR_ADDRESS_COUNT).map(async record => {
           let ens: string
           try {
-            ens = (await provider.lookupAddress(record.address)) || record.address
+            ens = (await this.provider.lookupAddress(record.address)) || record.address
           } catch (error) {
             ens = null
           }

@@ -3,13 +3,12 @@ import { ConfigModule } from '@nestjs/config'
 import { Env } from 'src/_constants/env'
 import { AppService } from 'src/app.service'
 import { AppController } from 'src/app.controller'
-import { AnyblockModule } from 'src/anyblock/anyblock.module'
-import { DumpedBlocksModule } from 'src/dumped-blocks/dumped-blocks.module'
-import { EventsModule } from 'src/events/events.module'
+import { EthereumModule } from 'src/ethereum/ethereum.module'
+import { TokenBalancesModule } from 'src/token-balances/token-balances.module'
+import { TransferEventsModule } from 'src/transfer-events/transfer-events.module'
 import { AppDatabaseModule } from 'src/app-database/app-database.module'
 import { TokenModule } from 'src/token/token.module'
 import { RanksModule } from 'src/ranks/ranks.module'
-import { CollectionOwnerModule } from 'src/collection-owner/collection-owner.module'
 
 @Module({
   imports: [
@@ -17,11 +16,10 @@ import { CollectionOwnerModule } from 'src/collection-owner/collection-owner.mod
       isGlobal: true,
       envFilePath: `.env.${process.env[Env.NodeEnv]}`
     }),
-    AnyblockModule,
+    EthereumModule,
     AppDatabaseModule,
-    EventsModule,
-    DumpedBlocksModule,
-    CollectionOwnerModule,
+    TransferEventsModule,
+    TokenBalancesModule,
     RanksModule,
     TokenModule
   ],
