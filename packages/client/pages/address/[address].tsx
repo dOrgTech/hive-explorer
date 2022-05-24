@@ -2,13 +2,14 @@ import React, { useState, useEffect } from 'react'
 import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import classnames from 'classnames'
+import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { getRankByAddress, isAxiosError, RankData } from 'utils/api'
 import Nav from 'components/nav'
 import D3Chart, { drawImage, removeImage } from 'components/d3_chart'
-import { ConnectButton } from '@rainbow-me/rainbowkit';
 
 type InitialState = {
   loading: boolean
+  address: string
   addressInput: string
   rankData: RankData | null
   showD3Chart: boolean
@@ -16,6 +17,7 @@ type InitialState = {
 }
 
 const initialState: InitialState = {
+  address: '',
   loading: false,
   addressInput: '',
   rankData: null,
@@ -25,7 +27,7 @@ const initialState: InitialState = {
 
 const AddressPage: NextPage = () => {
   const router = useRouter()
-  const { address } = router.query
+  const address = router.query.address as string
   const [loading, setLoading] = useState<InitialState['loading']>(initialState.loading)
   const [addressInput, setAddressInput] = useState<InitialState['address']>(address || initialState.addressInput)
   const [rankData, setRankData] = useState<InitialState['rankData']>(initialState.rankData)
@@ -41,19 +43,19 @@ const AddressPage: NextPage = () => {
 
   const handleSetAddress = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (error) {
-      setError(initialState.error);
+      setError(initialState.error)
     }
     setAddressInput(event.target.value)
   }
 
   const handleSubmit = async (event: React.SyntheticEvent) => {
-    event.preventDefault();
-    selectAddress(addressInput);
+    event.preventDefault()
+    selectAddress(addressInput)
   }
 
   const selectAddress = (newAddress: string) => {
     if (!newAddress) {
-      setError('Address field is empty');
+      setError('Address field is empty')
     } else {
       router.push(`/address/${newAddress}`)
     }
@@ -63,41 +65,37 @@ const AddressPage: NextPage = () => {
     return `https://opensea.io/${address}`
   }
 
-  const loadRank = async (address: string) => {
-    setAddressInput(address);
-    resetStateForRequest();
-    try {
-      if (!address) {
-        throw new Error('Address field is empty')
-      }
-
-      setLoading(true)
-      const data = await getRankByAddress(address)
-      setRankData(data)
-      drawImage(data)
-      setShowD3Chart(true)
-    } catch (error) {
-      if (isAxiosError(error)) {
-        setError(error.response?.data?.message ?? error.message)
-        return
-      }
-
-      if (error instanceof Error) {
-        setError(error.message)
-        return
-      }
-
-      setError('Unknown Error')
-    } finally {
-      setLoading(false)
-    }
-  }
-
   useEffect(() => {
     if (address) {
-      loadRank(address);
+      setAddressInput(address)
+      resetStateForRequest()
+      try {
+        if (!address) {
+          throw new Error('Address field is empty')
+        }
+
+        setLoading(true)
+        const data = await getRankByAddress(address)
+        setRankData(data)
+        drawImage(data)
+        setShowD3Chart(true)
+      } catch (error) {
+        if (isAxiosError(error)) {
+          setError(error.response?.data?.message ?? error.message)
+          return
+        }
+
+        if (error instanceof Error) {
+          setError(error.message)
+          return
+        }
+
+        setError('Unknown Error')
+      } finally {
+        setLoading(false)
+      }
     }
-  }, [address]);
+  }, [address])
 
   return (
     <div className="bg-white">
@@ -247,12 +245,8 @@ const AddressPage: NextPage = () => {
       ) : null}
       <div className="flex justify-center align-middle p-4">
         <p>
-          Don't see a collection?{' '}
-          <a
-            className="underline"
-            href="https://airtable.com/shrHM6Vsw4uAHiGug"
-            target="_blank"
-          >
+          Don&apos;t see a collection?&nbsp;
+          <a className="underline" href="https://airtable.com/shrHM6Vsw4uAHiGug" target="_blank" rel="noreferrer">
             Submit
           </a>{' '}
           a collection to be added to Hive!

@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
-import { ConnectButton } from '@rainbow-me/rainbowkit';
+import { ConnectButton } from '@rainbow-me/rainbowkit'
 
 import classnames from 'classnames'
 import Nav from 'components/nav'
@@ -13,7 +13,7 @@ type InitialState = {
 
 const initialState: InitialState = {
   address: '',
-  error: '',
+  error: ''
 }
 
 const Home: NextPage = () => {
@@ -24,17 +24,17 @@ const Home: NextPage = () => {
 
   const handleSetAddress = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (error) {
-      setError(initialState.error);
+      setError(initialState.error)
     }
     setAddress(event.target.value)
   }
 
   const handleSubmit = async (event: React.SyntheticEvent) => {
-    event.preventDefault();
+    event.preventDefault()
     if (!address) {
-      setError('Address field is empty');
+      setError('Address field is empty')
     } else {
-      router.push(`/address/${address}`);
+      router.push(`/address/${address}`)
     }
   }
 
@@ -88,24 +88,18 @@ const Home: NextPage = () => {
             .
           </h2>
           <p className="my-4">
-            This service lets you explore the relationship between addresses on the Ethereum blockchain. It combines
-            NFT ownership history with Jaccard similarity scoring to tell you which NFT collectors are most similar to
-            you.
+            This service lets you explore the relationship between addresses on the Ethereum blockchain. It combines NFT
+            ownership history with Jaccard similarity scoring to tell you which NFT collectors are most similar to you.
           </p>
         </div>
       </div>
       <div className="flex justify-center align-middle">
         <div className="px-4 w-full max-w-lg">
           <p className="my-4">
-            Don't see a collection?{' '}
-            <a
-              className="underline"
-              href="https://airtable.com/shrHM6Vsw4uAHiGug"
-              target="_blank"
-            >
-              Submit
-            </a>{' '}
-            a collection to be added to Hive!
+            Interested in making this service better? First your hive token then join our
+            <a className="underline" href="https://discord.gg/JjYUrPnDJT" target="_blank" rel="noreferrer">
+              Discord
+            </a>
           </p>
         </div>
       </div>

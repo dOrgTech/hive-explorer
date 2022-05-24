@@ -1,12 +1,6 @@
 import React from 'react'
 import * as d3 from 'd3'
-import {
-  useAccount,
-  useEnsAddress,
-  useSigner,
-  useProvider,
-  useContract,
-} from 'wagmi'
+import { useAccount, useEnsAddress, useSigner, useProvider, useContract } from 'wagmi'
 import { ethers, Contract } from 'ethers'
 import axios from 'axios'
 import { RankData, SignedTokenURI, createTokenMetadata } from 'utils/api'
@@ -120,19 +114,19 @@ type D3ChartProps = {
 }
 
 const D3Chart = ({ show, graphAddressOrENS }: D3ChartProps) => {
-  const provider = useProvider();
-  const { data: signer } = useSigner();
+  const provider = useProvider()
+  const { data: signer } = useSigner()
   const contract = useContract({
     addressOrName: '0xc5195f83dd41a5dc1b0d493dc44aa4a4bc4cd076',
     contractInterface: abi,
-    signer
-  });
+    signerOrProvider: signer
+  })
   // Get connected wallet address
-  const { data, isError, isLoading } = useAccount();
-  const userAddress = data?.address;
+  const { data, isError, isLoading } = useAccount()
+  const userAddress = data?.address
   // Get graph address if ENS name is passed
-  const { data: resolvedGraphAddress } = useEnsAddress({ name: graphAddressOrENS });
-  const graphAddress = resolvedGraphAddress ?? graphAddressOrENS;
+  const { data: resolvedGraphAddress } = useEnsAddress({ name: graphAddressOrENS })
+  const graphAddress = resolvedGraphAddress ?? graphAddressOrENS
 
   const mintImage = async () => {
     if (userAddress != graphAddress) {
@@ -143,8 +137,8 @@ const D3Chart = ({ show, graphAddressOrENS }: D3ChartProps) => {
     svgToCanvas(async (canvas: HTMLCanvasElement) => {
       const image = canvas.toDataURL()
       const timestamp = Math.floor(new Date().getTime() / 1000)
-      const signature = await signer.signMessage(`Minting my Hive.\n\nTimestamp: ${timestamp}`)
-      const result: SignedTokenURI = await createTokenMetadata(image, address, timestamp, signature)
+      const signature = await signer!.signMessage(`Minting my Hive.\n\nTimestamp: ${timestamp}`)
+      const result: SignedTokenURI = await createTokenMetadata(image, userAddress, timestamp, signature)
       await contract.mint(result.tokenURI, result.signature, {
         value: ethers.utils.parseEther('0.01')
       })
