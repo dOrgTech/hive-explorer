@@ -7,6 +7,8 @@ export enum Env {
   AppDbPort = 'DB_PORT',
   AppDbUsername = 'DB_USERNAME',
   AppDbPassword = 'DB_PASSWORD',
+  AWSAccessKeyId = 'AWS_ACCESS_KEY_ID',
+  AWSSecretAccessKey = 'AWS_SECRET_ACCESS_KEY',
   QueryBlockRangeSize = 'QUERY_BLOCK_RANGE_SIZE',
   QueryBlockRangeFloor = 'QUERY_BLOCK_RANGE_FLOOR',
   QueryBlockRangeCeiling = 'QUERY_BLOCK_RANGE_CEILING',
@@ -18,5 +20,6 @@ export enum Env {
   InfuraKey = 'INFURA_KEY',
   PinataKey = 'PINATA_KEY',
   PinataSecret = 'PINATA_SECRET',
-  EthereumKey = 'ETHEREUM_KEY'
+  EthereumKey = 'ETHEREUM_KEY',
+  EthereumNodeEndpoint = 'ETHEREUM_NODE_ENDPOINT'
 }

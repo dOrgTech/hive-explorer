@@ -1,7 +1,6 @@
 export enum Provider {
-  AnyBlockDatabase = 'ANY_BLOCK_DATABASE',
+  EthersProvider = 'ETHERS_PROVIDER',
   AppDatabase = 'APP_DATABASE',
-  DumpedBlocksRepository = 'DUMPED_BLOCKS_REPOSITORY',
-  EventsRepository = 'EVENTS_REPOSITORY',
-  CollectionOwnerRepository = 'COLLECTION_OWNER_REPOSITORY'
+  TokenBalancesRepository = 'TOKEN_BALANCES_REPOSITORY',
+  TransferEventsRepository = 'TRANSFER_EVENTS_REPOSITORY'
 }
