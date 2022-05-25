@@ -51,7 +51,7 @@ const Home: NextPage = () => {
         <meta name="msapplication-TileColor" content="#da532c" />
         <meta name="theme-color" content="#ffffff" />
       </Head>
-      <Nav onClickTitle={() => router.push('/')} />
+      <Nav />
       <div className="fixed right-2 bottom-3 md:top-3">
         <ConnectButton />
       </div>
@@ -107,9 +107,12 @@ const Home: NextPage = () => {
       <div className="flex justify-center align-middle mb-6">
         <div className="px-4 w-full max-w-lg">
           <img src="/hive-example.png" alt="hive-exmple" />
-          <h2 style={{ fontSize: '150%' }}>Join the community! Mint your <b>HIVE</b> token</h2>
+          <h2 style={{ fontSize: '150%' }}>
+            Join the community! Mint your <b>HIVE</b> token
+          </h2>
           <p className="my-4">
-            Interested in exploring the future of web3 data? Enter your ETH address above. Then, mint your HIVE token and hop on over to our&nbsp;
+            Interested in exploring the future of web3 data? Enter your ETH address above. Then, mint your HIVE token
+            and hop on over to our&nbsp;
             <a className="underline" href="https://discord.gg/JjYUrPnDJT" target="_blank" rel="noreferrer">
               Discord
             </a>

@@ -103,7 +103,7 @@ const AddressPage: NextPage = () => {
 
   return (
     <div className="bg-white">
-      <Nav onClickTitle={() => router.push('/')} />
+      <Nav />
       <div className="fixed right-2 bottom-3 md:top-3">
         <ConnectButton />
       </div>
@@ -194,9 +194,9 @@ const AddressPage: NextPage = () => {
               </a>
             </h2>
             <p className="my-4">
-              This service explores public blockchain data to surface affinities and shared interests among collectors of
-              NFTs. This is a first proof of concept on Ethereum and uses a simple algorithm. In the future we plan to
-              index multiple blockchains and provide more robust matching.
+              This service explores public blockchain data to surface affinities and shared interests among collectors
+              of NFTs. This is a first proof of concept on Ethereum and uses a simple algorithm. In the future we plan
+              to index multiple blockchains and provide more robust matching.
             </p>
           </div>
         </div>

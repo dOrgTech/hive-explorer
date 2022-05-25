@@ -1,5 +1,6 @@
 import React from 'react'
 import Image from 'next/image'
+import Link from 'next/link'
 
 const Nav = () => {
   return (
@@ -7,12 +8,13 @@ const Nav = () => {
       <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
         <div className="relative flex items-center justify-between h-16">
           <div className="flex-1 flex items-center justify-center">
-            <a href='/'
+            <Link
+              href="/"
               className="flex-shrink-0 flex items-center"
               style={{ fontWeight: 'bold', color: 'white', cursor: 'pointer' }}
             >
-              <img src='/Hive-Logo.png' alt='logo' style={{ width: '3em' }}/>
-            </a>
+              <img src="/Hive-Logo.png" alt="logo" style={{ width: '3em' }} />
+            </Link>
           </div>
         </div>
       </div>
