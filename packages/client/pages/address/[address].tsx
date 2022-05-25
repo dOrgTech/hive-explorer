@@ -105,7 +105,7 @@ const AddressPage: NextPage = () => {
     <div className="bg-white">
       <Nav />
       <div className="fixed right-2 bottom-3 md:top-3">
-        <ConnectButton />
+        <ConnectButton showBalance={{ smallScreen: false, largeScreen: false }} />
       </div>
       <div className="flex justify-center align-middle pt-1 pb-4">
         <form className="w-full max-w-sm" onSubmit={handleSubmit}>
