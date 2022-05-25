@@ -55,12 +55,12 @@ const Home: NextPage = () => {
       <div className="fixed right-2 bottom-3 md:top-3">
         <ConnectButton />
       </div>
-      <div className="flex justify-center align-middle pt-4 pb-4">
+      <div className="flex justify-center align-middle pt-1 pb-4">
         <form className="w-full max-w-sm" onSubmit={handleSubmit}>
           <div className="flex items-center">
             <input
               placeholder="eth address"
-              className="ml-4 bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-800"
+              className="ml-4 bg-gray-200 appearance-none border-2 border-gray-200 rounded-xl w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-black"
               type="text"
               value={address}
               onChange={handleSetAddress}
@@ -68,7 +68,7 @@ const Home: NextPage = () => {
             <div className="ml-4 mr-4">
               <button
                 // disabled={loading}
-                className="shadow bg-purple-800 hover:bg-purple-700 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-4 rounded"
+                className="shadow bg-black hover:bg-slate-800 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-4 rounded-xl"
                 type="submit"
               >
                 Explore
@@ -96,26 +96,24 @@ const Home: NextPage = () => {
             <a className="underline" href="https://dorg.tech">
               dOrg
             </a>
-            .
           </h2>
           <p className="my-4">
             This service explores public blockchain data to surface affinities and shared interests among collectors of
             NFTs. This is a first proof of concept on Ethereum and uses a simple algorithm. In the future we plan to
-            index multiple blockchains and more robust matching.
+            index multiple blockchains and provide more robust matching.
           </p>
         </div>
       </div>
-      <div className="flex justify-center align-middle">
+      <div className="flex justify-center align-middle mb-6">
         <div className="px-4 w-full max-w-lg">
           <img src="/hive-example.png" alt="hive-exmple" />
-          <h2 style={{ fontSize: '150%' }}>Join the community: mint your HIVE token.</h2>
+          <h2 style={{ fontSize: '150%' }}>Join the community! Mint your <b>HIVE</b> token</h2>
           <p className="my-4">
-            Interested in exploring the future of web3 data? Mint your HIVE token then hop on over to our&nbsp;
+            Interested in exploring the future of web3 data? Enter your ETH address above. Then, mint your HIVE token and hop on over to our&nbsp;
             <a className="underline" href="https://discord.gg/JjYUrPnDJT" target="_blank" rel="noreferrer">
               Discord
             </a>
-            ! Start by entering your ETH address above. You will also be able to discover who shares the most NFTs in
-            common with you and mint your HIVE token.
+            !
           </p>
         </div>
       </div>

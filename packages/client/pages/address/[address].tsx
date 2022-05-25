@@ -107,12 +107,12 @@ const AddressPage: NextPage = () => {
       <div className="fixed right-2 bottom-3 md:top-3">
         <ConnectButton />
       </div>
-      <div className="flex justify-center align-middle pt-4 pb-4">
+      <div className="flex justify-center align-middle pt-1 pb-4">
         <form className="w-full max-w-sm" onSubmit={handleSubmit}>
           <div className="flex items-center">
             <input
               placeholder="eth address"
-              className="ml-4 bg-gray-200 appearance-none border-2 border-gray-200 rounded w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-purple-800"
+              className="ml-4 bg-gray-200 appearance-none border-2 border-gray-200 rounded-xl w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-black"
               type="text"
               value={addressInput}
               onChange={handleSetAddress}
@@ -121,7 +121,7 @@ const AddressPage: NextPage = () => {
               <button
                 disabled={loading}
                 className={classnames(
-                  'shadow bg-purple-800 hover:bg-purple-700 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-4 rounded',
+                  'shadow bg-black hover:bg-slate-800 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-4 rounded-xl',
                   loading ? 'bg-gray-500 hover:bg-gray-500' : null
                 )}
                 type="submit"
@@ -145,7 +145,7 @@ const AddressPage: NextPage = () => {
         <div className="flex justify-center align-middle pt-4 pb-4">
           <svg
             role="status"
-            className="mr-2 w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-purple-700"
+            className="w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-black"
             viewBox="0 0 100 101"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
@@ -184,7 +184,7 @@ const AddressPage: NextPage = () => {
         <div className="flex justify-center align-middle">
           <div className="px-4 w-full max-w-lg">
             <h2 style={{ fontSize: '150%' }}>
-              Welcome to the Hive Explorer, a project by{' '}
+              Welcome to Hive, a project by{' '}
               <a className="underline" href="https://cent.co">
                 Cent
               </a>{' '}
@@ -192,12 +192,11 @@ const AddressPage: NextPage = () => {
               <a className="underline" href="https://dorg.tech">
                 dOrg
               </a>
-              .
             </h2>
             <p className="my-4">
-              This service lets you explore the relationship between addresses on the Ethereum blockchain. It combines
-              NFT ownership history with Jaccard similarity scoring to tell you which NFT collectors are most similar to
-              you.
+              This service explores public blockchain data to surface affinities and shared interests among collectors of
+              NFTs. This is a first proof of concept on Ethereum and uses a simple algorithm. In the future we plan to
+              index multiple blockchains and provide more robust matching.
             </p>
           </div>
         </div>

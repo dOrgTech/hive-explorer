@@ -27,7 +27,8 @@ const App = (props: AppProps) => {
       <RainbowKitProvider
         chains={chains}
         theme={lightTheme({
-          accentColor: '#6B21A8'
+          accentColor: '#FFF',
+          accentColorForeground: '#000'
         })}
       >
         <Component {...pageProps} />
