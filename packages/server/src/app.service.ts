@@ -54,14 +54,14 @@ export class AppService {
 
         // 3a. insert events into the table
         if (transferEvents.length > 0) {
-          await this.transferEventsService.bulkCreate(transferEvents)
+          this.transferEventsService.bulkCreate(transferEvents)
         }
         this.lastBlock = endBlock + 1
         this.blockIncrement = Math.min(
           10_000,
           Math.floor(Math.min(
             this.blockIncrement * 1.5 + 1,
-            5000 * this.blockIncrement / (transferEvents.length || 1)
+            5000 * (this.blockIncrement || 1) / (transferEvents.length || 1)
           ))
         )
       }
