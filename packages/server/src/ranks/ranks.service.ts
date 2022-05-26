@@ -1,4 +1,4 @@
-import * as Jaccard from 'jaccard-index'
+import Jaccard from 'jaccard-index'
 import isEthereumAddress from 'validator/lib/isEthereumAddress'
 import { Provider } from 'src/_constants/providers'
 import { Inject, Injectable } from '@nestjs/common'
