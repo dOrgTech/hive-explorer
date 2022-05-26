@@ -43,7 +43,6 @@ export class RanksService {
           address: address,
           score: Jaccard().index(userSet, othersCollectionsMap[address]).toFixed(3) as string
         }))
-        .concat([{ address: normalizedAddress, score: '1.000' }])
         .sort((a, b) => (a.score < b.score ? 1 : -1))
 
       const contractAbi = ['function name() view returns (string)']
@@ -82,7 +81,9 @@ export class RanksService {
         rank: rankedSubset
       }
     } else {
-      return { collections: [], rank: [] }
+      const rank = [{ address: normalizedAddress, score: '1.000' }]
+      rank[0].ens = (await this.provider.lookupAddress(normalizedAddress)) || normalizedAddress
+      return { collections: [], rank }
     }
   }
 }
