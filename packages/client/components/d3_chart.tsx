@@ -152,14 +152,14 @@ const D3Chart = ({ show, graphAddressOrENS }: D3ChartProps) => {
       {show ? (
         <div className="flex justify-center align-middle">
           <button
-            className="shadow bg-purple-800 hover:bg-purple-700 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-4 rounded"
+            className="shadow bg-black hover:bg-slate-800 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-4 rounded-xl"
             onClick={copyImage}
           >
             Copy Image
           </button>
           &nbsp;
           <button
-            className="hadow bg-purple-800 hover:bg-purple-700 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-4 rounded"
+            className="shadow bg-black hover:bg-slate-800 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-4 rounded-xl"
             onClick={() => mintImage()}
           >
             Mint Ξ0.01
