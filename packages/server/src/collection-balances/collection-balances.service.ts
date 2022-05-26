@@ -67,12 +67,9 @@ export class CollectionBalancesService {
 
   findCollectionsByOwner(ownerAddress: string) {
     return this.collectionBalancesRepository.findAll({
-      attributes: ['owner_address'],
+      attributes: ['contract_address'],
       where: {
-        owner_address: ownerAddress,
-        balance: {
-          [Op.gt]: 0
-        }
+        owner_address: ownerAddress
       }
     })
   }
@@ -86,9 +83,6 @@ export class CollectionBalancesService {
         },
         contract_address: {
           [Op.in]: ownerCollections
-        },
-        balance: {
-          [Op.gt]: 0
         }
       }
     })
