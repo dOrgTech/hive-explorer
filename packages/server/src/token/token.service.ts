@@ -48,7 +48,7 @@ export class TokenService {
     const imageURI = `ipfs://${imageUpload.data.IpfsHash}`;
 
     const metadataUpload = await axios.post('https://api.pinata.cloud/pinning/pinJSONToIPFS', {
-      name: `hive://${name}`,
+      name: name,
       image: imageURI,
       description: 'A graph of NFT holders grouped by Jaccard similarity scores',
       external_url: 'https://hive.cent.co'
