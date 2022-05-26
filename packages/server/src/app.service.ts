@@ -14,7 +14,7 @@ export class AppService {
   ) { }
 
   private lastBlock: number = 0
-  private blockIncrement: number = 10_000
+  private blockIncrement: number = 100
   private currentBlock: number = 0
 
   async dump() {
