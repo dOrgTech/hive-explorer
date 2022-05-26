@@ -81,7 +81,7 @@ export class RanksService {
         rank: rankedSubset
       }
     } else {
-      const rank = [{ address: normalizedAddress, score: '1.000' }]
+      const rank = [{ address: normalizedAddress, score: '1.000', ens: '' }]
       rank[0].ens = (await this.provider.lookupAddress(normalizedAddress)) || normalizedAddress
       return { collections: [], rank }
     }
