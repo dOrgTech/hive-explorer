@@ -2,7 +2,7 @@ import * as Jaccard from 'jaccard-index'
 import isEthereumAddress from 'validator/lib/isEthereumAddress'
 import { Provider } from 'src/_constants/providers'
 import { Inject, Injectable } from '@nestjs/common'
-import { TokenBalancesService } from 'src/token-balances/token-balances.service'
+import { CollectionBalancesService } from 'src/collection-balances/collection-balances.service'
 import { Contract, ethers } from 'ethers'
 import { ConfigService } from '@nestjs/config'
 import { Env } from 'src/_constants/env'
@@ -12,7 +12,7 @@ import { ErrorMessage } from 'src/_constants/errors'
 export class RanksService {
   constructor(
     private readonly configService: ConfigService,
-    private readonly tokenBalancesService: TokenBalancesService,
+    private readonly collectionBalancesService: CollectionBalancesService,
     @Inject(Provider.EthersProvider) private provider: ethers.providers.JsonRpcProvider
   ) {}
 
@@ -27,10 +27,10 @@ export class RanksService {
 
     const normalizedAddress = ethers.utils.getAddress(resolvedAddress).toLowerCase()
 
-    const collections = await this.tokenBalancesService.findCollectionsByOwner(normalizedAddress)
+    const collections = await this.collectionBalancesService.findCollectionsByOwner(normalizedAddress)
     if (collections.length > 0) {
       const userSet = collections.map(c => c.contract_address)
-      const othersCollections = await this.tokenBalancesService.findSharedCollections(normalizedAddress, userSet)
+      const othersCollections = await this.collectionBalancesService.findSharedCollections(normalizedAddress, userSet)
 
       const othersCollectionsMap = {}
       othersCollections.forEach(c => {

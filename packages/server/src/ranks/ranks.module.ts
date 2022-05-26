@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common'
 import { RanksController } from 'src/ranks/ranks.controller'
 import { RanksService } from './ranks.service'
-import { TokenBalancesModule } from 'src/token-balances/token-balances.module'
+import { CollectionBalancesModule } from 'src/collection-balances/collection-balances.module'
 import { EthereumRPCModule } from 'src/ethereum-rpc/ethereum-rpc.module'
 
 @Module({
-  imports: [TokenBalancesModule, EthereumRPCModule],
+  imports: [CollectionBalancesModule, EthereumRPCModule],
   controllers: [RanksController],
   providers: [RanksService]
 })

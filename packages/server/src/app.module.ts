@@ -4,7 +4,6 @@ import { Env } from 'src/_constants/env'
 import { AppService } from 'src/app.service'
 import { AppController } from 'src/app.controller'
 import { EthereumModule } from 'src/ethereum/ethereum.module'
-import { TokenBalancesModule } from 'src/token-balances/token-balances.module'
 import { TransferEventsModule } from 'src/transfer-events/transfer-events.module'
 import { AppDatabaseModule } from 'src/app-database/app-database.module'
 import { TokenModule } from 'src/token/token.module'
@@ -19,7 +18,6 @@ import { RanksModule } from 'src/ranks/ranks.module'
     EthereumModule,
     AppDatabaseModule,
     TransferEventsModule,
-    TokenBalancesModule,
     RanksModule,
     TokenModule
   ],

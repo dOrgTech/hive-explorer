@@ -1,7 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common'
 import { EthereumService } from 'src/ethereum/ethereum.service'
 import { TransferEventsService } from 'src/transfer-events/transfer-events.service'
-import { TokenBalancesService } from 'src/token-balances/token-balances.service'
 import { ConfigService } from '@nestjs/config'
 import { Env } from 'src/_constants/env'
 
@@ -11,12 +10,11 @@ export class AppService {
     private readonly logger: Logger,
     private readonly configService: ConfigService,
     private readonly ethereumService: EthereumService,
-    private readonly transferEventsService: TransferEventsService,
-    private readonly tokenBalancesService: TokenBalancesService
+    private readonly transferEventsService: TransferEventsService
   ) { }
 
   private lastBlock: number = 0
-  private blockIncrement: number = 5000
+  private blockIncrement: number = 10_000
   private currentBlock: number = 0
 
   async dump() {
@@ -47,7 +45,6 @@ export class AppService {
       }
 
       // 2. scan the block range
-
       try {
         const startBlock = this.lastBlock
         const endBlock = Math.min(startBlock + this.blockIncrement, this.currentBlock)
@@ -58,14 +55,15 @@ export class AppService {
         // 3a. insert events into the table
         if (transferEvents.length > 0) {
           await this.transferEventsService.bulkCreate(transferEvents)
-
-          // 4. update user token balances table
-          await this.tokenBalancesService.bulkUpsert(transferEvents)
-
-          // 5. update the contract names, ens names
         }
         this.lastBlock = endBlock + 1
-        this.blockIncrement++ // Additive increase
+        this.blockIncrement = Math.min(
+          10_000,
+          Math.floor(Math.min(
+            this.blockIncrement * 1.5 + 1,
+            5000 * this.blockIncrement / (transferEvents.length || 1)
+          ))
+        )
       }
       catch (e) {
         // 3b. if the range results in an error, reduce the size and retry

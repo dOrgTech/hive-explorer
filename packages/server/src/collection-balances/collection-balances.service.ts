@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common'
-import { TokenBalance } from 'src/token-balances/token-balance.entity'
+import { CollectionBalance } from 'src/collection-balances/collection-balance.entity'
 import { TransferEventRecord } from 'src/ethereum/types'
 import { Provider } from 'src/_constants/providers'
 import { QueryTypes, Op } from 'sequelize'
@@ -8,15 +8,15 @@ import { ethers } from 'ethers'
 const NULL_ADDRESS = '0x0000000000000000000000000000000000000000';
 
 @Injectable()
-export class TokenBalancesService {
-  constructor(@Inject(Provider.TokenBalancesRepository) private tokenBalancesRepository: typeof TokenBalance) {}
+export class CollectionBalancesService {
+  constructor(@Inject(Provider.CollectionBalancesRepository) private collectionBalancesRepository: typeof CollectionBalance) {}
 
   async bulkUpsert(records: TransferEventRecord[]) {
     const upserts = {};
     records.forEach(r => {
       if (r.from_address !== NULL_ADDRESS) {
         const id = ethers.utils.id(
-          `${r.chain_id}-${r.contract_address}-${r.from_address}-${r.token_id}`
+          `${r.chain_id}-${r.contract_address}-${r.from_address}`
         ).substring(2)
 
         if (!upserts[id]) {
@@ -24,7 +24,6 @@ export class TokenBalancesService {
             chainID: r.chain_id,
             contract: r.contract_address,
             address: r.from_address,
-            tokenID: r.token_id,
             quantities: [`-${r.quantity}`]
           }
         }
@@ -34,7 +33,7 @@ export class TokenBalancesService {
       }
       if (r.to_address !== NULL_ADDRESS) {
         const id = ethers.utils.id(
-          `${r.chain_id}-${r.contract_address}-${r.to_address}-${r.token_id}`
+          `${r.chain_id}-${r.contract_address}-${r.to_address}`
         ).substring(2)
 
         if (!upserts[id]) {
@@ -42,7 +41,6 @@ export class TokenBalancesService {
             chainID: r.chain_id,
             contract: r.contract_address,
             address: r.to_address,
-            tokenID: r.token_id,
             quantities: [r.quantity]
           }
         }
@@ -54,21 +52,21 @@ export class TokenBalancesService {
     const values = Object.keys(upserts).map(id => {
       const r = upserts[id]
       const balance = r.quantities.join('+')
-      return `('${id}',${r.chainID},'${r.contract}','${r.address}',${r.tokenID},${balance})`
+      return `('${id}',${r.chainID},'${r.contract}','${r.address}',${balance})`
     }).join(',')
 
     if (values.length > 0) {
       const query = `
-      INSERT INTO token_balances (id, chain_id, contract_address, owner_address, token_id, balance)
+      INSERT INTO token_balances (hash_id, chain_id, contract_address, owner_address, balance)
       VALUES ${values}
-      ON CONFLICT (id) DO UPDATE SET balance = token_balances.balance + EXCLUDED.balance
+      ON CONFLICT (hash_id) DO UPDATE SET balance = token_balances.balance + EXCLUDED.balance
       `
-      await this.tokenBalancesRepository.sequelize.query(query, { type: QueryTypes.INSERT, raw: true })
+      await this.collectionBalancesRepository.sequelize.query(query, { type: QueryTypes.INSERT, raw: true })
     }
   }
 
   findCollectionsByOwner(ownerAddress: string) {
-    return this.tokenBalancesRepository.findAll({
+    return this.collectionBalancesRepository.findAll({
       attributes: ['contract_address'],
       where: {
         owner_address: ownerAddress,
@@ -80,7 +78,7 @@ export class TokenBalancesService {
   }
 
   findSharedCollections(ownerAddress: string, ownerCollections: string[]) {
-    return this.tokenBalancesRepository.findAll({
+    return this.collectionBalancesRepository.findAll({
       attributes: ['contract_address', 'owner_address'],
       where: {
         owner_address: {

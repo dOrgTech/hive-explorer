@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config'
 import { Provider } from 'src/_constants/providers'
 import { Env } from 'src/_constants/env'
 import { TransferEvent } from 'src/transfer-events/transfer-event.entity'
-import { TokenBalance } from 'src/token-balances/token-balance.entity'
+import { CollectionBalance } from 'src/collection-balances/collection-balance.entity'
 
 export const appDatabaseProvider = [
   {
@@ -24,7 +24,7 @@ export const appDatabaseProvider = [
           timestamps: false
         }
       })
-      sequelize.addModels([TransferEvent, TokenBalance])
+      sequelize.addModels([TransferEvent, CollectionBalance])
       // @TODO: maybe we don't need to sync in production (find a way to do migrations)
       await sequelize.sync()
       return sequelize
