@@ -4,6 +4,8 @@ import { Provider } from 'src/_constants/providers'
 import { QueryTypes } from 'sequelize'
 import { TransferEventRecord } from 'src/ethereum/types'
 import { ethers } from 'ethers'
+import { ConfigService } from '@nestjs/config'
+import { Env } from 'src/_constants/env'
 
 const transferEvents = new ethers.utils.Interface([
   'event Transfer(address indexed _from, address indexed _to, uint256 _tokenId)',
@@ -20,14 +22,25 @@ const ERC1155_BATCH = transferEvents.getEventTopic('TransferBatch(address indexe
 
 @Injectable()
 export class EthereumService {
-  constructor(@Inject(Provider.EthersProvider) private provider: ethers.providers.JsonRpcProvider) {}
+  constructor(
+    private readonly configService: ConfigService,
+    @Inject(Provider.EthersProvider) private provider: ethers.providers.JsonRpcProvider
+  ) {}
 
   async getLatestBlockNumber(): Promise<number> {
     return await this.provider.getBlockNumber();
   }
 
   async findEventsByBlockRange(startBlock: number, endBlock: number): Promise<TransferEventRecord[]> {
-    const logs = await this.provider.getLogs({
+    let provider = this.provider
+    if (startBlock === endBlock) {
+      const SecondaryEthereumNodeEndpoint = this.configService.get<string>(Env.SecondaryEthereumNodeEndpoint)
+      provider = new ethers.providers.StaticJsonRpcProvider(SecondaryEthereumNodeEndpoint, {
+        name: 'Ethereum',
+        chainId: 1
+      })
+    }
+    const logs = await provider.getLogs({
       topics: [
         [
           ERC20_721,

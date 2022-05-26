@@ -4,14 +4,12 @@ import { Provider } from 'src/_constants/providers'
 import { Inject, Injectable } from '@nestjs/common'
 import { CollectionBalancesService } from 'src/collection-balances/collection-balances.service'
 import { Contract, ethers } from 'ethers'
-import { ConfigService } from '@nestjs/config'
 import { Env } from 'src/_constants/env'
 import { ErrorMessage } from 'src/_constants/errors'
 
 @Injectable()
 export class RanksService {
   constructor(
-    private readonly configService: ConfigService,
     private readonly collectionBalancesService: CollectionBalancesService,
     @Inject(Provider.EthersProvider) private provider: ethers.providers.JsonRpcProvider
   ) {}
@@ -45,6 +43,7 @@ export class RanksService {
           address: address,
           score: Jaccard().index(userSet, othersCollectionsMap[address]).toFixed(3) as string
         }))
+        .concat([{ address: normalizedAddress, score: '1.000' }])
         .sort((a, b) => (a.score < b.score ? 1 : -1))
 
       const contractAbi = ['function name() view returns (string)']

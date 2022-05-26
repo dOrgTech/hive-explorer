@@ -21,5 +21,6 @@ export enum Env {
   PinataKey = 'PINATA_KEY',
   PinataSecret = 'PINATA_SECRET',
   EthereumKey = 'ETHEREUM_KEY',
-  EthereumNodeEndpoint = 'ETHEREUM_NODE_ENDPOINT'
+  EthereumNodeEndpoint = 'ETHEREUM_NODE_ENDPOINT',
+  SecondaryEthereumNodeEndpoint = 'SECONDARY_ETHEREUM_NODE_ENDPOINT'
 }

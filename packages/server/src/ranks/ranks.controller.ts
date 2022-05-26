@@ -10,7 +10,7 @@ export class RanksController {
     try {
       return await this.ranksService.getRankByAddress(address)
     } catch (error) {
-      throw new HttpException(ErrorMessage.InternalServerError, HttpStatus.INTERNAL_SERVER_ERROR)
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR)
     }
   }
 }

@@ -10,13 +10,8 @@ export const ethereumRPCProvider = [
     inject: [ConfigService],
     useFactory: async (config: ConfigService) => {
       const EthereumNodeEndpoint = config.get<string>(Env.EthereumNodeEndpoint)
-      if (false) {
-        return new ethers.providers.StaticJsonRpcProvider(EthereumNodeEndpoint, {
-          name: 'Ethereum',
-          chainId: 1
-        })
-      }
-      else {
+      const amb = true
+      if (amb) {
         const accessKeyId = config.get<string>(Env.AWSAccessKeyId)
         const secretAccessKey = config.get<string>(Env.AWSSecretAccessKey)
         const baseProvider = new AWSHttpProvider(EthereumNodeEndpoint, {
@@ -24,6 +19,12 @@ export const ethereumRPCProvider = [
           secretAccessKey
         })
         return new ethers.providers.Web3Provider(baseProvider)
+      }
+      else {
+        return new ethers.providers.StaticJsonRpcProvider(EthereumNodeEndpoint, {
+          name: 'Ethereum',
+          chainId: 1
+        })
       }
     }
   }
