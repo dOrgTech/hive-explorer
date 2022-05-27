@@ -66,6 +66,7 @@ export class RanksService {
   }
 
   async getRankByAddress(address: string) {
+    const start = new Date().getTime()
     const SIMILAR_ADDRESS_COUNT = 50
 
     const resolvedAddress = await this.provider.resolveName(address.toLocaleLowerCase())
@@ -76,28 +77,39 @@ export class RanksService {
 
     const normalizedAddress = ethers.utils.getAddress(resolvedAddress).toLowerCase()
 
-    const start = new Date().getTime()
     let ranked = []
+    let cutoff = 0
+    let matches = new Set([normalizedAddress])
     const userCollections = this.ownerContractMap[normalizedAddress] || new Set()
+    const userCollectionsSize = userCollections.size
     userCollections.forEach(contract => {
-      const matches = new Set(ranked.map(r => r.address).concat(normalizedAddress))
       const list = []
       this.contractOwnerMap[contract].forEach(owner => {
         if (!matches.has(owner)) {
-          list.push({
-            address: owner,
-            score: jaccard(userCollections, this.ownerContractMap[owner] || new Set())
-          })
+          const otherCollections = this.ownerContractMap[owner] || new Set()
+          if (otherCollections.size / userCollectionsSize > cutoff) {
+            const score = jaccard(userCollections, otherCollections)
+            if (score > cutoff) {
+              list.push({
+                address: owner,
+                score
+              })
+            }
+          }
         }
       })
 
-      ranked = list
-        .concat(ranked)
-        .sort((a, b) => (a.score < b.score ? 1 : -1))
-        .slice(0, SIMILAR_ADDRESS_COUNT)
+      if (list.length > 0) {
+        ranked = list
+          .concat(ranked)
+          .sort((a, b) => (a.score < b.score ? 1 : -1))
+          .slice(0, SIMILAR_ADDRESS_COUNT)
+
+        cutoff = ranked.length == SIMILAR_ADDRESS_COUNT ? ranked[SIMILAR_ADDRESS_COUNT - 1].score : 0
+        matches = new Set(ranked.map(r => r.address).concat(normalizedAddress))
+      }
     })
-    const end = new Date().getTime()
-    this.logger.log(`Completed Rank in ${Math.floor((end - start) / 1000)}s`)
+    this.logger.log(`Ranked in ${Math.floor((new Date().getTime() - start) / 1000)}s`)
 
     const contractAbi = ['function name() view returns (string)']
     const userCollectionsNames = await Promise.all(
