@@ -8,13 +8,21 @@ import { Env } from 'src/_constants/env'
 import { ErrorMessage } from 'src/_constants/errors'
 
 const jaccard = (setA, setB) => {
-  const union = new Set(setA)
   let intersection = 0
-  setB.forEach((n) => {
-    if (setA.has(n)) {
-      intersection++
-    }
-  })
+  if (setA.size < setB.size) {
+    setA.forEach((n) => {
+      if (setB.has(n)) {
+        intersection++
+      }
+    })
+  }
+  else {
+    setB.forEach((n) => {
+      if (setA.has(n)) {
+        intersection++
+      }
+    })
+  }
   return intersection / (setA.size + setB.size - intersection)
 }
 
@@ -58,7 +66,6 @@ export class RanksService {
   }
 
   async getRankByAddress(address: string) {
-    this.logger.log('A')
     const SIMILAR_ADDRESS_COUNT = 50
 
     const resolvedAddress = await this.provider.resolveName(address.toLocaleLowerCase())
@@ -68,7 +75,8 @@ export class RanksService {
     }
 
     const normalizedAddress = ethers.utils.getAddress(resolvedAddress).toLowerCase()
-    this.logger.log('B')
+
+    const start = new Date().getTime()
     let ranked = []
     const userCollections = this.ownerContractMap[normalizedAddress] || new Set()
     userCollections.forEach(contract => {
@@ -76,8 +84,8 @@ export class RanksService {
       this.contractOwnerMap[contract].forEach(owner => {
         if (owner != normalizedAddress) {
           list.push({
-            address,
-            score: jaccard(userCollections, this.ownerContractMap[address] || new Set())
+            address: owner,
+            score: jaccard(userCollections, this.ownerContractMap[owner] || new Set())
           })
         }
       })
@@ -87,8 +95,9 @@ export class RanksService {
         .sort((a, b) => (a.score < b.score ? 1 : -1))
         .slice(0, SIMILAR_ADDRESS_COUNT)
     })
+    const end = new Date().getTime()
+    this.logger.log(`Completed Rank in ${Math.floor((end - start) / 1000)}s`)
 
-    this.logger.log('C')
     const contractAbi = ['function name() view returns (string)']
     const userCollectionsNames = await Promise.all(
       Array.from(userCollections).map(async (contractAddress: string) => {
@@ -108,7 +117,6 @@ export class RanksService {
       })
     )
 
-    this.logger.log('D')
     const rankedSubset = await Promise.all(
       ranked.slice(0, SIMILAR_ADDRESS_COUNT).map(async record => {
         let ens: string
@@ -126,7 +134,6 @@ export class RanksService {
       })
     )
 
-    this.logger.log('E')
     if (rankedSubset.length === 0) {
       const ens = (await this.provider.lookupAddress(normalizedAddress)) || normalizedAddress
       return {
