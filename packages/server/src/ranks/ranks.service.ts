@@ -80,9 +80,10 @@ export class RanksService {
     let ranked = []
     const userCollections = this.ownerContractMap[normalizedAddress] || new Set()
     userCollections.forEach(contract => {
+      const matches = new Set(ranked.map(r => r.address).concat(normalizedAddress))
       const list = []
       this.contractOwnerMap[contract].forEach(owner => {
-        if (owner != normalizedAddress) {
+        if (!matches.has(owner)) {
           list.push({
             address: owner,
             score: jaccard(userCollections, this.ownerContractMap[owner] || new Set())
