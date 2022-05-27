@@ -32,29 +32,18 @@ export class RanksService {
       results.forEach((c, i) => {
         const ownerAddress = c.owner_address.toLowerCase()
         if (!this.ownerContractMap[ownerAddress]) {
-          this.ownerContractMap[ownerAddress] = {[c.contract_address]: true}
+          this.ownerContractMap[ownerAddress] = new Set()
         }
-        else {
-          this.ownerContractMap[ownerAddress][c.contract_address] = true
-        }
+        this.ownerContractMap[ownerAddress].add(c.contract_address)
         if (!this.contractOwnerMap[c.contract_address]) {
-          this.contractOwnerMap[c.contract_address] = {[ownerAddress]: true}
+          this.contractOwnerMap[c.contract_address] = new Set()
         }
-        else {
-          this.contractOwnerMap[c.contract_address][ownerAddress] = true
-        }
+        this.contractOwnerMap[c.contract_address].add(ownerAddress)
       })
       offset += results.length
       this.logger.log(`MAPPED: ${offset} entries`)
     }
-    Object.keys(this.ownerContractMap).forEach(owner =>
-      this.ownerContractMap[owner] = Object.keys(this.ownerContractMap[owner])
-    )
-    this.logger.log('LOADED OWNERS')
-    Object.keys(this.contractOwnerMap).forEach(contract =>
-      this.contractOwnerMap[contract] = Object.keys(this.contractOwnerMap[contract])
-    )
-    this.logger.log('LOADED CONTRACTS')
+    this.logger.log('LOADED')
   }
 
   async getRankByAddress(address: string) {
@@ -68,17 +57,19 @@ export class RanksService {
 
     const normalizedAddress = ethers.utils.getAddress(resolvedAddress).toLowerCase()
 
-    const userCollections = this.ownerContractMap[normalizedAddress]
     let ranked = []
+    const userCollections: string[] = Array.from(this.ownerContractMap[normalizedAddress] || [])
     userCollections.forEach(contract => {
       const matches = { [normalizedAddress]: true }
       ranked.forEach(r => matches[r.address] = true)
 
-      ranked = this.contractOwnerMap[contract]
+      const owners: string[] = Array.from(this.contractOwnerMap[contract])
+
+      ranked = owners
         .filter(address => !matches[address])
         .map(address => ({
           address,
-          score: Jaccard().index(userCollections, this.ownerContractMap[address]).toFixed(3)
+          score: Jaccard().index(userCollections, Array.from(this.ownerContractMap[address] || [])).toFixed(3)
         }))
         .concat(ranked)
         .sort((a, b) => (a.score < b.score ? 1 : -1))
