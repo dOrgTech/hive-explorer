@@ -23,7 +23,8 @@ async function bootstrap() {
   }
 
   const port = process.env[Env.AppPort] || 5001
-  await app.listen(port)
+  const server = await app.listen(port)
+  server.setTimeout(30 * 60 * 1000)
   Logger.log(`Running on port:${port} in ${process.env.NODE_ENV} mode`)
 }
 bootstrap()
