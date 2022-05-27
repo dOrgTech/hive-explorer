@@ -142,6 +142,7 @@ const D3Chart = ({ show, graphAddressOrENS }: D3ChartProps) => {
       await contract.mint(result.tokenURI, result.signature, {
         value: ethers.utils.parseEther('0.01')
       })
+      window.alert('Mint transaction submitted!')
     })
   }
 
@@ -150,20 +151,26 @@ const D3Chart = ({ show, graphAddressOrENS }: D3ChartProps) => {
       <div className={show ? '' : 'invisible'} id="d3-chart-wrapper" />
       <div style={{ display: 'none' }} id="d3-chart-wrapper-shadow" />
       {show ? (
-        <div className="flex justify-center align-middle">
-          <button
-            className="shadow bg-black hover:bg-slate-800 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-4 rounded-xl"
-            onClick={copyImage}
-          >
-            Copy Image
-          </button>
-          &nbsp;
-          <button
-            className="shadow bg-black hover:bg-slate-800 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-4 rounded-xl"
-            onClick={() => mintImage()}
-          >
-            Mint Ξ0.01
-          </button>
+        <div style={{ textAlign: 'center' }}>
+          <div className="flex justify-center align-middle">
+            <button
+              className="shadow bg-black hover:bg-slate-800 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-4 rounded-xl"
+              onClick={copyImage}
+            >
+              Copy Image
+            </button>
+            <button
+              className="ml-4 shadow bg-black hover:bg-slate-800 focus:shadow-outline focus:outline-none text-white font-bold py-2 px-4 rounded-xl"
+              onClick={() => mintImage()}
+            >
+              Mint Ξ0.01
+            </button>
+          </div>
+          <br />
+          <a className="underline" target="_blank" rel="noreferrer" href="https://opensea.io/collection/hive-explorer">
+            View collection on Opensea
+          </a>
+          <br />
         </div>
       ) : null}
     </div>
