@@ -221,7 +221,7 @@ const AddressPage: NextPage = () => {
                       {ens ?? address}
                     </span>
                   </td>
-                  <td className="border px-4 py-2">{score}</td>
+                  <td className="border px-4 py-2">{parseFloat(score).toFixed(3)}</td>
                 </tr>
               ))}
             </tbody>
