@@ -35,6 +35,7 @@ export const getRankByAddress = async (address: string) => {
   const res = await axios.request<RankData>({
     method: 'get',
     url: `${baseURL}/ranks/${address}`,
+    timeout: 10 * 60 * 1000, // 10 minutes
     transformResponse: res => JSON.parse(res)
   })
   return res.data

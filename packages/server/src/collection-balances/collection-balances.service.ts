@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common'
 import { CollectionBalance } from 'src/collection-balances/collection-balance.entity'
 import { TransferEventRecord } from 'src/ethereum/types'
 import { Provider } from 'src/_constants/providers'
-import { QueryTypes, Op } from 'sequelize'
+import { QueryTypes, Op, fn, col } from 'sequelize'
 import { ethers } from 'ethers'
 
 const NULL_ADDRESS = '0x0000000000000000000000000000000000000000';
@@ -70,6 +70,50 @@ export class CollectionBalancesService {
       attributes: ['contract_address'],
       where: {
         owner_address: ownerAddress
+      }
+    })
+  }
+
+  findCollectionOwners(ownerAddress: string, ownerCollections: string[], limit: number, offset: number) {
+    return this.collectionBalancesRepository.findAll({
+      attributes: [
+        [fn('DISTINCT', col('owner_address')), 'owner_address']
+      ],
+      where: {
+        owner_address: {
+          [Op.notIn]: [NULL_ADDRESS, ownerAddress]
+        },
+        contract_address: {
+          [Op.in]: ownerCollections
+        }
+      },
+      // order: [[ 'id', 'DESC' ]],
+      limit,
+      offset
+    })
+  }
+
+  findAll(limit: number, offset: number) {
+    return this.collectionBalancesRepository.findAll({
+      attributes: ['contract_address', 'owner_address'],
+      // where: {
+      //   owner_address: {
+      //     [Op.in]: ['0x4133c79E575591b6c380c233FFFB47a13348DE86']
+      //   }
+      // },
+      order: [[ 'id', 'DESC' ]],
+      limit,
+      offset
+    })
+  }
+
+  findCollectionsByOwners(ownerAddresses: string[]) {
+    return this.collectionBalancesRepository.findAll({
+      attributes: ['contract_address', 'owner_address'],
+      where: {
+        owner_address: {
+          [Op.in]: ownerAddresses
+        }
       }
     })
   }
